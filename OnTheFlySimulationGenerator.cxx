@@ -27,7 +27,7 @@
 #include <AliAnalysisTaskEmcalJetTree.h>
 #include <AliAnalysisTaskEmcalJetQA.h>
 #include <AliEmcalMCTrackSelector.h>
-
+#include <AliAnalysisTaskEmcalJetShapesMC.h>
 #include "AliPythia6_dev.h"
 #include "AliPythia8_dev.h"
 #include "AliGenReaderHepMC_dev.h"
@@ -306,16 +306,90 @@ void OnTheFlySimulationGenerator::AddJetTree(const char* file_name)
     AliAnalysisManager::SetCommonFileName(fname);
   }
 
-  AliEmcalJetTask* pJetTaskCh04 = AliEmcalJetTask::AddTaskEmcalJet("mcparticles", "", AliJetContainer::antikt_algorithm, 0.4, AliJetContainer::kChargedJet, 0., 0., 0.1, AliJetContainer::pt_scheme, "Jet", 0., kFALSE, kFALSE);
-  pJetTaskCh04->SetVzRange(-999,999);
-  pJetTaskCh04->SetNeedEmcalGeom(kFALSE);
-  AliEmcalJetTask* pJetTaskCh06 = AliEmcalJetTask::AddTaskEmcalJet("mcparticles", "", AliJetContainer::antikt_algorithm, 0.6, AliJetContainer::kChargedJet, 0., 0., 0.1, AliJetContainer::pt_scheme, "Jet", 0., kFALSE, kFALSE);
-  pJetTaskCh06->SetVzRange(-999,999);
-  pJetTaskCh06->SetNeedEmcalGeom(kFALSE);
-  AliEmcalJetTask* pJetTaskFu04 = AliEmcalJetTask::AddTaskEmcalJet("mcparticles", "", AliJetContainer::antikt_algorithm, 0.4, AliJetContainer::kFullJet, 0., 0., 0.1, AliJetContainer::pt_scheme, "Jet", 0., kFALSE, kFALSE);
-  pJetTaskFu04->SetVzRange(-999,999);
-  pJetTaskFu04->SetNeedEmcalGeom(kFALSE);
+ 
 
+AliEmcalJetTask* pJetTaskFull02E = AliEmcalJetTask::AddTaskEmcalJet("mcparticles", "", AliJetContainer::antikt_algorithm, 0.2, AliJetContainer::kFullJet, 0., 0., 0.1, AliJetContainer::E_scheme, "Jet", 0., kFALSE, kFALSE);
+  pJetTaskFull02E->SetVzRange(-999,999);
+  pJetTaskFull02E->SetNeedEmcalGeom(kFALSE);
+  pJetTaskFull02E->SetUseBuiltinEventSelection(kTRUE);
+AliEmcalJetTask* pJetTaskFull03E = AliEmcalJetTask::AddTaskEmcalJet("mcparticles", "", AliJetContainer::antikt_algorithm, 0.3, AliJetContainer::kFullJet, 0., 0., 0.1, AliJetContainer::E_scheme, "Jet", 0., kFALSE, kFALSE);
+  pJetTaskFull03E->SetVzRange(-999,999);
+  pJetTaskFull03E->SetNeedEmcalGeom(kFALSE);
+pJetTaskFull03E->SetUseBuiltinEventSelection(kTRUE);
+  AliEmcalJetTask* pJetTaskFull04E = AliEmcalJetTask::AddTaskEmcalJet("mcparticles", "", AliJetContainer::antikt_algorithm, 0.4, AliJetContainer::kFullJet, 0., 0., 0.1, AliJetContainer::E_scheme, "Jet", 0., kFALSE, kFALSE);
+  pJetTaskFull04E->SetVzRange(-999,999);
+  pJetTaskFull04E->SetNeedEmcalGeom(kFALSE);
+ pJetTaskFull04E->SetUseBuiltinEventSelection(kTRUE);
+
+AliEmcalJetTask* pJetTaskFull05E = AliEmcalJetTask::AddTaskEmcalJet("mcparticles", "", AliJetContainer::antikt_algorithm, 0.5, AliJetContainer::kFullJet, 0., 0., 0.1, AliJetContainer::E_scheme, "Jet", 0., kFALSE, kFALSE);
+  pJetTaskFull05E->SetVzRange(-999,999);
+  pJetTaskFull05E->SetNeedEmcalGeom(kFALSE);
+pJetTaskFull05E->SetUseBuiltinEventSelection(kTRUE);
+AliEmcalJetTask* pJetTaskFull06E = AliEmcalJetTask::AddTaskEmcalJet("mcparticles", "", AliJetContainer::antikt_algorithm, 0.6, AliJetContainer::kFullJet, 0., 0., 0.1, AliJetContainer::E_scheme, "Jet", 0., kFALSE, kFALSE);
+  pJetTaskFull06E->SetVzRange(-999,999);
+  pJetTaskFull06E->SetNeedEmcalGeom(kFALSE);
+  pJetTaskFull06E->SetUseBuiltinEventSelection(kTRUE);
+
+
+  
+ AliAnalysisTaskEmcalJetShapesMC* pJetShape1 = AliAnalysisTaskEmcalJetShapesMC::AddTaskJetShapesMC("Jet_AKTFullR020_mcparticles_pT0000_E_scheme",0.2, 0.2, "mcparticles","TPC","V0M",1<<30,"","","MC", "", AliAnalysisTaskEmcalJetShapesMC::kGenShapes, AliAnalysisTaskEmcalJetShapesMC::kNoSub, AliAnalysisTaskEmcalJetShapesMC::kInclusive);
+  pJetShape1->SetNeedEmcalGeom(kFALSE);
+  pJetShape1->SetCentralitySelectionOn(kFALSE);
+  pJetShape1->SetIsPythia(kTRUE);
+  pJetShape1->SetJetPtThreshold(20);
+  pJetShape1->SetUseBuiltinEventSelection(kTRUE);
+  pJetShape1->SetForceBeamType(AliAnalysisTaskEmcal::kpp);
+  pJetShape1->SetGeneratePythiaInfoObject(kFALSE); 
+  pJetShape1->SetGetPtHardBinFromPath(false);
+  pJetShape1->SetOptionalPartonInfo(kFALSE);
+
+AliAnalysisTaskEmcalJetShapesMC* pJetShape2 = AliAnalysisTaskEmcalJetShapesMC::AddTaskJetShapesMC("Jet_AKTFullR030_mcparticles_pT0000_E_scheme",0.3, 0.2, "mcparticles","TPC","V0M",1<<30,"","","MC", "", AliAnalysisTaskEmcalJetShapesMC::kGenShapes, AliAnalysisTaskEmcalJetShapesMC::kNoSub, AliAnalysisTaskEmcalJetShapesMC::kInclusive);
+  pJetShape2->SetNeedEmcalGeom(kFALSE);
+  pJetShape2->SetCentralitySelectionOn(kFALSE);
+  pJetShape2->SetIsPythia(kTRUE);
+  pJetShape2->SetJetPtThreshold(20);
+   pJetShape2->SetUseBuiltinEventSelection(kTRUE);
+  pJetShape2->SetForceBeamType(AliAnalysisTaskEmcal::kpp);
+  pJetShape2->SetGeneratePythiaInfoObject(kFALSE); 
+  pJetShape2->SetGetPtHardBinFromPath(false);
+  pJetShape2->SetOptionalPartonInfo(kFALSE);
+
+ AliAnalysisTaskEmcalJetShapesMC* pJetShape3 = AliAnalysisTaskEmcalJetShapesMC::AddTaskJetShapesMC("Jet_AKTFullR040_mcparticles_pT0000_E_scheme",0.4, 0.2, "mcparticles","TPC","V0M",1<<30,"","","MC", "", AliAnalysisTaskEmcalJetShapesMC::kGenShapes, AliAnalysisTaskEmcalJetShapesMC::kNoSub, AliAnalysisTaskEmcalJetShapesMC::kInclusive);
+  pJetShape3->SetNeedEmcalGeom(kFALSE);
+  pJetShape3->SetCentralitySelectionOn(kFALSE);
+  pJetShape3->SetIsPythia(kTRUE);
+  pJetShape3->SetJetPtThreshold(20);
+   pJetShape3->SetUseBuiltinEventSelection(kTRUE);
+  pJetShape3->SetForceBeamType(AliAnalysisTaskEmcal::kpp);
+  pJetShape3->SetGeneratePythiaInfoObject(kFALSE); 
+  pJetShape3->SetGetPtHardBinFromPath(false);
+    pJetShape3->SetOptionalPartonInfo(kFALSE);
+
+AliAnalysisTaskEmcalJetShapesMC* pJetShape4 = AliAnalysisTaskEmcalJetShapesMC::AddTaskJetShapesMC("Jet_AKTFullR050_mcparticles_pT0000_E_scheme",0.5, 0.2, "mcparticles","TPC","V0M",1<<30,"","","MC", "", AliAnalysisTaskEmcalJetShapesMC::kGenShapes, AliAnalysisTaskEmcalJetShapesMC::kNoSub, AliAnalysisTaskEmcalJetShapesMC::kInclusive);
+  pJetShape4->SetNeedEmcalGeom(kFALSE);
+  pJetShape4->SetCentralitySelectionOn(kFALSE);
+  pJetShape4->SetIsPythia(kTRUE);
+  pJetShape4->SetJetPtThreshold(20);
+   pJetShape4->SetUseBuiltinEventSelection(kTRUE);
+  pJetShape4->SetForceBeamType(AliAnalysisTaskEmcal::kpp);
+  pJetShape4->SetGeneratePythiaInfoObject(kFALSE); 
+  pJetShape4->SetGetPtHardBinFromPath(false);
+    pJetShape4->SetOptionalPartonInfo(kFALSE);
+
+AliAnalysisTaskEmcalJetShapesMC* pJetShape5 = AliAnalysisTaskEmcalJetShapesMC::AddTaskJetShapesMC("Jet_AKTFullR060_mcparticles_pT0000_E_scheme",0.6, 0.2, "mcparticles","TPC","V0M",1<<30,"","","MC", "", AliAnalysisTaskEmcalJetShapesMC::kGenShapes, AliAnalysisTaskEmcalJetShapesMC::kNoSub, AliAnalysisTaskEmcalJetShapesMC::kInclusive);
+  pJetShape5->SetNeedEmcalGeom(kFALSE);
+  pJetShape5->SetCentralitySelectionOn(kFALSE);
+  pJetShape5->SetIsPythia(kTRUE);
+  pJetShape5->SetJetPtThreshold(20);
+   pJetShape5->SetUseBuiltinEventSelection(kTRUE);
+  pJetShape5->SetForceBeamType(AliAnalysisTaskEmcal::kpp);
+  pJetShape5->SetGeneratePythiaInfoObject(kFALSE); 
+  pJetShape5->SetGetPtHardBinFromPath(false);
+  pJetShape5->SetOptionalPartonInfo(kFALSE);
+
+
+
+  
   AliAnalysisTaskEmcalJetTreeBase* pJetSpectraTask = nullptr;
   if (fExtendedEventInfo) {
     pJetSpectraTask = AliAnalysisTaskEmcalJetTreeBase::AddTaskEmcalJetTree("mcparticles", "", 0, 0, AliAnalysisTaskEmcalJetTreeBase::kJetPPChargedSimulation);
