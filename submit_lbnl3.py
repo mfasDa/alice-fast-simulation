@@ -111,6 +111,7 @@ def SubmitProcessingJobs(TrainName, LocalPath, Events, Jobs, Gen, Proc, yamlFile
                         "lhapdf_utils.py",
                         "powheg_pythia8_conf.cmnd",
                         "Makefile", "HepMC.tar",
+                        "THepMCParser_dev.h", "THepMCParser_dev.cxx",
                         "AliGenExtFile_dev.h", "AliGenExtFile_dev.cxx",
                         "AliGenReaderHepMC_dev.h", "AliGenReaderHepMC_dev.cxx",
                         "AliGenEvtGen_dev.h", "AliGenEvtGen_dev.cxx",
