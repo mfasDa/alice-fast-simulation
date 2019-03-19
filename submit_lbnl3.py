@@ -10,6 +10,15 @@ import yaml
 import UserConfiguration
 import GeneratePowhegInput
 
+def TestSlurm():
+    try:
+        sbatchpath = subprocess.check_output(["which", "sbatch"]).rstrip()
+    except subprocess.CalledProcessError:
+        print("Slurm executable '{}' not found!".format("sbatch"))
+        return False
+    print("Slurm found in '{}'".format(sbatchpath))
+    return True
+
 def subprocessCall(cmd):
     print(cmd)
     return subprocess.call(cmd)
@@ -27,6 +36,7 @@ def CopyFilesToTheWorkingDir(Files, LocalDest):
         shutil.copy(file, LocalDest)
 
 def SubmitParallel(LocalDest, ExeFile, Events, Jobs, yamlFileName):
+    isSlurm = TestSlurm()
     for ijob in range(0, Jobs):
         JobDir = LocalDest
         JobOutput = "{}/JobOutput_{:04d}.log".format(JobDir, ijob)
@@ -34,14 +44,18 @@ def SubmitParallel(LocalDest, ExeFile, Events, Jobs, yamlFileName):
         with open(RunJobFileName, "w") as myfile:
             myfile.write("#!/bin/bash\n")
             myfile.write(GenerateComments())
-            myfile.write("#PBS -o %s\n" % (JobOutput))
-            myfile.write("#PBS -j oe\n")
+            if isSlurm:
+                myfile.write("#SBATCH --output=%s\n" % (JobOutput))
+            else:
+                myfile.write("#PBS -o %s\n" % (JobOutput))
+                myfile.write("#PBS -j oe\n")
             myfile.write("source /home/salvatore/load_alice.sh\n")
             myfile.write("{LocalDest}/{ExeFile} {yamlFileName} --numevents {Events} --job-number {ijob} --batch-job lbnl3\n".format(LocalDest=LocalDest, ExeFile=ExeFile, yamlFileName=yamlFileName, Events=Events, ijob=ijob))
-        output = subprocessCheckOutput(["qsub", RunJobFileName])
+        output = subprocessCheckOutput(["sbatch" if isSlurm else "qsub", RunJobFileName])
         print(output)
 
 def SubmitParallelPowheg(LocalDest, ExeFile, Events, Jobs, yamlFileName, PowhegStage, XGridIter):
+    isSlurm = TestSlurm()
     input_file_name = GeneratePowhegInput.GetParallelInputFileName(PowhegStage, XGridIter)
     shutil.copy("{}/{}".format(LocalDest, input_file_name), "{}/powheg.input".format(LocalDest))
 
@@ -65,12 +79,15 @@ def SubmitParallelPowheg(LocalDest, ExeFile, Events, Jobs, yamlFileName, PowhegS
         with open(RunJobFileName, "w") as myfile:
             myfile.write("#!/bin/bash\n")
             myfile.write(GenerateComments())
-            myfile.write("#PBS -o %s\n" % (JobOutput))
-            myfile.write("#PBS -j oe\n")
-            myfile.write("source /home/salvatore/load_alice.sh\n")
+            if isSlurm:
+                myfile.write("#SBATCH --output=%s\n" % (JobOutput))
+            else:
+                myfile.write("#PBS -o %s\n" % (JobOutput))
+                myfile.write("#PBS -j oe\n")
+            myfile.write("source $HOME/powheg_herwig_env.sh\n") 
             myfile.write("{LocalDest}/{ExeFile} {LocalDest}/{yamlFileName} --numevents {Events} --job-number {ijob} --powheg-stage {PowhegStage} --batch-job lbnl3\n".format(LocalDest=LocalDest, ExeFile=ExeFile, yamlFileName=yamlFileName, Events=Events, ijob=ijob, PowhegStage=PowhegStage))
         os.chmod(RunJobFileName, 0755)
-        output = subprocessCheckOutput(["qsub", RunJobFileName])
+        output = subprocessCheckOutput(["sbatch" if isSlurm else "qsub", RunJobFileName])
         print(output)
 
 def GenerateComments():
