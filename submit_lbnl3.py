@@ -46,6 +46,9 @@ def SubmitParallel(LocalDest, ExeFile, Events, Jobs, yamlFileName):
             myfile.write(GenerateComments())
             if isSlurm:
                 myfile.write("#SBATCH --output=%s\n" % (JobOutput))
+                myfile.write("#SBATCH -N 1\n")
+                myfile.write("#SBATCH -n 1\n")
+                myfile.write("#SBATCH -c 1\n")
             else:
                 myfile.write("#PBS -o %s\n" % (JobOutput))
                 myfile.write("#PBS -j oe\n")
@@ -81,6 +84,9 @@ def SubmitParallelPowheg(LocalDest, ExeFile, Events, Jobs, yamlFileName, PowhegS
             myfile.write(GenerateComments())
             if isSlurm:
                 myfile.write("#SBATCH --output=%s\n" % (JobOutput))
+                myfile.write("#SBATCH -N 1\n")
+                myfile.write("#SBATCH -n 1\n")
+                myfile.write("#SBATCH -c 1\n")
             else:
                 myfile.write("#PBS -o %s\n" % (JobOutput))
                 myfile.write("#PBS -j oe\n")
@@ -167,7 +173,7 @@ def main(UserConf, yamlFileName, continue_powheg, powheg_stage, XGridIter):
     try:
         rootPath = subprocess.check_output(["which", "root"]).rstrip()
         alirootPath = subprocess.check_output(["which", "aliroot"]).rstrip()
-        qsubPath = subprocess.check_output(["which", "qsub"]).rstrip()
+        qsubPath = subprocess.check_output(["which", "sbatch" if TestSlurm() else "qsub"]).rstrip()
     except subprocess.CalledProcessError:
         print "Environment is not configured correctly!"
         exit()
