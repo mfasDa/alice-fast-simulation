@@ -336,56 +336,56 @@ AliEmcalJetTask* pJetTaskFull06E = AliEmcalJetTask::AddTaskEmcalJet("mcparticles
   pJetShape1->SetNeedEmcalGeom(kFALSE);
   pJetShape1->SetCentralitySelectionOn(kFALSE);
   pJetShape1->SetIsPythia(kTRUE);
-  pJetShape1->SetJetPtThreshold(20);
+  pJetShape1->SetJetPtThreshold(10);
   pJetShape1->SetUseBuiltinEventSelection(kTRUE);
   pJetShape1->SetForceBeamType(AliAnalysisTaskEmcal::kpp);
-  pJetShape1->SetGeneratePythiaInfoObject(kFALSE); 
+  pJetShape1->SetGeneratePythiaInfoObject(kTRUE); 
   pJetShape1->SetGetPtHardBinFromPath(false);
-  pJetShape1->SetOptionalPartonInfo(kFALSE);
+  pJetShape1->SetOptionalPartonInfo(kTRUE);
 
 AliAnalysisTaskEmcalJetShapesMC* pJetShape2 = AliAnalysisTaskEmcalJetShapesMC::AddTaskJetShapesMC("Jet_AKTFullR030_mcparticles_pT0000_E_scheme",0.3, 0.2, "mcparticles","TPC","V0M",1<<30,"","","MC", "", AliAnalysisTaskEmcalJetShapesMC::kGenShapes, AliAnalysisTaskEmcalJetShapesMC::kNoSub, AliAnalysisTaskEmcalJetShapesMC::kInclusive);
   pJetShape2->SetNeedEmcalGeom(kFALSE);
   pJetShape2->SetCentralitySelectionOn(kFALSE);
   pJetShape2->SetIsPythia(kTRUE);
-  pJetShape2->SetJetPtThreshold(20);
-   pJetShape2->SetUseBuiltinEventSelection(kTRUE);
+  pJetShape2->SetJetPtThreshold(10);
+  pJetShape2->SetUseBuiltinEventSelection(kTRUE);
   pJetShape2->SetForceBeamType(AliAnalysisTaskEmcal::kpp);
-  pJetShape2->SetGeneratePythiaInfoObject(kFALSE); 
+  pJetShape2->SetGeneratePythiaInfoObject(kTRUE); 
   pJetShape2->SetGetPtHardBinFromPath(false);
-  pJetShape2->SetOptionalPartonInfo(kFALSE);
+  pJetShape2->SetOptionalPartonInfo(kTRUE);
 
  AliAnalysisTaskEmcalJetShapesMC* pJetShape3 = AliAnalysisTaskEmcalJetShapesMC::AddTaskJetShapesMC("Jet_AKTFullR040_mcparticles_pT0000_E_scheme",0.4, 0.2, "mcparticles","TPC","V0M",1<<30,"","","MC", "", AliAnalysisTaskEmcalJetShapesMC::kGenShapes, AliAnalysisTaskEmcalJetShapesMC::kNoSub, AliAnalysisTaskEmcalJetShapesMC::kInclusive);
   pJetShape3->SetNeedEmcalGeom(kFALSE);
   pJetShape3->SetCentralitySelectionOn(kFALSE);
   pJetShape3->SetIsPythia(kTRUE);
-  pJetShape3->SetJetPtThreshold(20);
-   pJetShape3->SetUseBuiltinEventSelection(kTRUE);
+  pJetShape3->SetJetPtThreshold(10);
+  pJetShape3->SetUseBuiltinEventSelection(kTRUE);
   pJetShape3->SetForceBeamType(AliAnalysisTaskEmcal::kpp);
-  pJetShape3->SetGeneratePythiaInfoObject(kFALSE); 
+  pJetShape3->SetGeneratePythiaInfoObject(kTRUE); 
   pJetShape3->SetGetPtHardBinFromPath(false);
-    pJetShape3->SetOptionalPartonInfo(kFALSE);
+  pJetShape3->SetOptionalPartonInfo(kTRUE);
 
 AliAnalysisTaskEmcalJetShapesMC* pJetShape4 = AliAnalysisTaskEmcalJetShapesMC::AddTaskJetShapesMC("Jet_AKTFullR050_mcparticles_pT0000_E_scheme",0.5, 0.2, "mcparticles","TPC","V0M",1<<30,"","","MC", "", AliAnalysisTaskEmcalJetShapesMC::kGenShapes, AliAnalysisTaskEmcalJetShapesMC::kNoSub, AliAnalysisTaskEmcalJetShapesMC::kInclusive);
   pJetShape4->SetNeedEmcalGeom(kFALSE);
   pJetShape4->SetCentralitySelectionOn(kFALSE);
   pJetShape4->SetIsPythia(kTRUE);
-  pJetShape4->SetJetPtThreshold(20);
-   pJetShape4->SetUseBuiltinEventSelection(kTRUE);
+  pJetShape4->SetJetPtThreshold(10);
+  pJetShape4->SetUseBuiltinEventSelection(kTRUE);
   pJetShape4->SetForceBeamType(AliAnalysisTaskEmcal::kpp);
-  pJetShape4->SetGeneratePythiaInfoObject(kFALSE); 
+  pJetShape4->SetGeneratePythiaInfoObject(kTRUE); 
   pJetShape4->SetGetPtHardBinFromPath(false);
-    pJetShape4->SetOptionalPartonInfo(kFALSE);
+  pJetShape4->SetOptionalPartonInfo(kFALSE);
 
 AliAnalysisTaskEmcalJetShapesMC* pJetShape5 = AliAnalysisTaskEmcalJetShapesMC::AddTaskJetShapesMC("Jet_AKTFullR060_mcparticles_pT0000_E_scheme",0.6, 0.2, "mcparticles","TPC","V0M",1<<30,"","","MC", "", AliAnalysisTaskEmcalJetShapesMC::kGenShapes, AliAnalysisTaskEmcalJetShapesMC::kNoSub, AliAnalysisTaskEmcalJetShapesMC::kInclusive);
   pJetShape5->SetNeedEmcalGeom(kFALSE);
   pJetShape5->SetCentralitySelectionOn(kFALSE);
   pJetShape5->SetIsPythia(kTRUE);
-  pJetShape5->SetJetPtThreshold(20);
-   pJetShape5->SetUseBuiltinEventSelection(kTRUE);
+  pJetShape5->SetJetPtThreshold(10);
+  pJetShape5->SetUseBuiltinEventSelection(kTRUE);
   pJetShape5->SetForceBeamType(AliAnalysisTaskEmcal::kpp);
-  pJetShape5->SetGeneratePythiaInfoObject(kFALSE); 
+  pJetShape5->SetGeneratePythiaInfoObject(kTRUE); 
   pJetShape5->SetGetPtHardBinFromPath(false);
-  pJetShape5->SetOptionalPartonInfo(kFALSE);
+  pJetShape5->SetOptionalPartonInfo(kTRUE);
 
 
 
