@@ -67,7 +67,7 @@ def CopyFilesToTheGrid(Files, AlienDest, LocalDest, Offline, GridUpdate):
         print "Creating directory " + LocalDest
         os.makedirs(LocalDest)
     for file in Files:
+        fname = os.path.basename(file)
         if not Offline:
-            fname = os.path.basename(file)
             AlienCopy(file, "alien://{}/{}".format(AlienDest, fname), 3, GridUpdate)
-        shutil.copy(file, LocalDest)
+        shutil.copy(file, os.path.join(LocalDest, fname))
