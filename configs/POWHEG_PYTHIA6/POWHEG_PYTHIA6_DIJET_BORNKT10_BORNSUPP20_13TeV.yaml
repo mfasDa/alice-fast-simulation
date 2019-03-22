@@ -7,7 +7,7 @@ lhans: 11000
 beam_type: pp
 ebeam1: 6500
 ebeam2: 6500
-add_d_mesons: yes
+add_d_mesons: no
 extended_event_info: yes
 powheg_config:
   bornktmin: 10
@@ -15,4 +15,4 @@ powheg_config:
 grid_config:
   ttl: 80000
   max_files_per_job: 20
-  aliphysics: vAN-20190317_ROOT6-1
+  aliphysics: vAN-20190317-1
