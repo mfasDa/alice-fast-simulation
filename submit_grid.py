@@ -228,14 +228,14 @@ def SubmitProcessingJobs(TrainName, LocalPath, AlienPath, AliPhysicsVersion, Off
         if OldPowhegInit:
             if PowhegStage == 0:
                 alipowhegtools.main(yamlFileName, "./", Events, 0)
-                FilesToCopy.extend(["{}/pwggrid.dat".format(OldPowhegInit), "{}/pwgubound.dat".format(OldPowhegInit)])
+                FilesToCopy.extend(["data/{}/pwggrid.dat".format(OldPowhegInit), "data/{}/pwgubound.dat".format(OldPowhegInit)])
             elif PowhegStage == 4:
                 alipowhegtools.main(yamlFileName, "./", Events, 4)
                 os.rename(alipowhegtools.GetParallelInputFileName(4), "powheg.input")
                 EssentialFilesToCopy = ["pwggrid-????.dat", "pwggridinfo-btl-xg?-????.dat", "pwgubound-????.dat"]
 
                 for fpattern in EssentialFilesToCopy:
-                    for file in glob.glob("{}/{}".format(OldPowhegInit, fpattern)): FilesToCopy.append(file)
+                    for file in glob.glob("data/{}/{}".format(OldPowhegInit, fpattern)): FilesToCopy.append(file)
 
                 seed_file_name = "pwgseeds.dat"
                 FilesToDelete.append(seed_file_name)
@@ -295,7 +295,7 @@ def SubmitProcessingJobs(TrainName, LocalPath, AlienPath, AliPhysicsVersion, Off
 
         FilesToCopy.extend([JdlFile, ExeFile, ValidationScript])
 
-        CopyFilesToTheGrid(FilesToCopy, AlienDest, LocalDest, Offline, GridUpdate)
+        aligridtools.CopyFilesToTheGrid(FilesToCopy, AlienDest, LocalDest, Offline, GridUpdate)
         if not Offline:
             alisimtools.subprocess_call(["alien_submit", "alien://{0}/{1}".format(AlienDest, JdlFile)])
         for file in FilesToDelete: os.remove(file)
