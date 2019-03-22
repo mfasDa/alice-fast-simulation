@@ -15,6 +15,7 @@ from alifastsim import GeneratePowhegInput as alipowhegtools
 from alifastsim import Tools as alisimtools
 from alifastsim import cernbatchtools as alicernsub
 from alifastsim import nerscnatchtools as alinerscsub
+from alifastsim import PackageTools as alipackagetools
 
 repo = os.path.abspath(os.path.dirname(sys.argv[0]))
 
@@ -27,7 +28,7 @@ class submit_exception(Exception):
         return "Submitting job failed..."
 
 def get_batchtools():
-    if alinerscsub.is_nersc_system:
+    if alinerscsub.is_nersc_system():
         return alinerscsub.nerscbatchtools()
     return alicernsub.cernbatchtools()
 
@@ -41,7 +42,7 @@ def SubmitParallel(LocalDest, ExeFile, Events, Jobs, yamlFileName, batchconfig):
             myfile.write("#!/bin/bash\n")
             myfile.write(alipackagetools.GenerateComments())
             batchtools.get_batchhandler()(myfile, batchconfig, JobOutput)
-            batchtools.writeSimCommand(repo, myfile, "{LocalDest}/{ExeFile} {yamlFileName} --numevents {Events} --job-number {ijob} --batch-job lbnl3\n".format(LocalDest=LocalDest, ExeFile=ExeFile, yamlFileName=yamlFileName, Events=Events, ijob=ijob))
+            batchtools.writeSimCommand(repo, myfile, "{LocalDest}/{ExeFile} {yamlFileName} --numevents {Events} --job-number {ijob} --batch-job lbnl3\n".format(LocalDest=LocalDest, ExeFile=ExeFile, yamlFileName=os.path.basename(yamlFileName), Events=Events, ijob=ijob))
         output = alisimtools.subprocess_checkoutput([batchtools.get_batchsub(), RunJobFileName])
         print(output)
 
@@ -49,7 +50,7 @@ def SubmitParallelPowheg(LocalDest, ExeFile, Events, Jobs, yamlFileName, batchco
     batchtools = get_batchtools()
     input_file_name = alipowhegtools.GetParallelInputFileName(PowhegStage, XGridIter)
     shutil.copy("{}/{}".format(LocalDest, input_file_name), "{}/powheg.input".format(LocalDest))
-    njobconfigStage = {{1, 10}, {2, 20}, {3, 10}, {4, Jobs}} # Dictionary in stage:jobs
+    njobconfigStage = {1: 10, 2: 20, 3: 10, 4: Jobs} # Dictionary in stage:jobs
 
     for ijob in range(1, njobconfigStage[PowhegStage] + 1):
         JobDir = LocalDest
@@ -61,9 +62,9 @@ def SubmitParallelPowheg(LocalDest, ExeFile, Events, Jobs, yamlFileName, batchco
             RunJobFileName = "{}/RunJob_{}_{:04d}.sh".format(JobDir, PowhegStage, ijob)
         with open(RunJobFileName, "w") as myfile:
             myfile.write("#!/bin/bash\n")
-            myfile.write(GenerateComments())
+            myfile.write(alipackagetools.GenerateComments())
             batchtools.get_batchhandler()(myfile, batchconfig, JobOutput)
-            batchtools.writeSimCommand(repo, myfile, "{LocalDest}/{ExeFile} {LocalDest}/{yamlFileName} --numevents {Events} --job-number {ijob} --powheg-stage {PowhegStage} --batch-job lbnl3\n".format(LocalDest=LocalDest, ExeFile=ExeFile, yamlFileName=yamlFileName, Events=Events, ijob=ijob, PowhegStage=PowhegStage))
+            batchtools.writeSimCommand(repo, myfile, "{LocalDest}/{ExeFile} {LocalDest}/{yamlFileName} --numevents {Events} --job-number {ijob} --powheg-stage {PowhegStage} --batch-job lbnl3\n".format(LocalDest=LocalDest, ExeFile=ExeFile, yamlFileName=os.path.basename(yamlFileName), Events=Events, ijob=ijob, PowhegStage=PowhegStage))
         os.chmod(RunJobFileName, 0755)
         output = alisimtools.subprocess_checkoutput([batchtools.get_batchsub(), RunJobFileName])
         logging.info("%s", output)
@@ -92,7 +93,11 @@ def SubmitProcessingJobs(TrainName, LocalPath, Events, Jobs, Gen, Proc, yamlFile
                 rnd = random.randint(0, 1073741824)  # 2^30
                 myfile.write("{}\n".format(rnd))
 
-        FilesToCopy = [yamlFileName, "OnTheFlySimulationGenerator.cxx", "OnTheFlySimulationGenerator.h",
+        FilesToCopy = {}
+        FilesToCopy["%s/%s" %(repo, yamlFileName)] = "%s/%s" %(LocalDest, os.path.basename(yamlFileName))
+        FilesToCopy["%s/%s" %(repo, ExeFile)] = "%s/%s" %(LocalDest, ExeFile)
+
+        Sourcefiles = ["OnTheFlySimulationGenerator.cxx", "OnTheFlySimulationGenerator.h",
                         "runJetSimulation.C", "start_simulation.C",
                         "lhapdf_utils.py",
                         "powheg_pythia8_conf.cmnd",
@@ -105,9 +110,10 @@ def SubmitProcessingJobs(TrainName, LocalPath, Events, Jobs, Gen, Proc, yamlFile
                         "AliPythia6_dev.h", "AliPythia6_dev.cxx",
                         "AliPythia8_dev.h", "AliPythia8_dev.cxx",
                         "AliPythiaBase_dev.h", "AliPythiaBase_dev.cxx"]
+        for f in Sourcefiles:
+            FilesToCopy["%s/%s" %(repo, f)] = "%s/%s" %(LocalDest, f)
 
-        FilesToCopy.extend([ExeFile])
-        alisimtools.copy_to_workdir(FilesToCopy, LocalDest)
+        alisimtools.copy_to_workdir(FilesToCopy)
 
         logging.info("Compiling analysis code...")
         get_batchtools().run_build(repo, LocalDest)
@@ -136,7 +142,7 @@ def main(UserConf, yamlFileName, batchconfig, continue_powheg, powheg_stage, XGr
     else:
         unixTS = continue_powheg
         copy_files = False
-        logging.info("Continue job with timestamp %d" unixTS)
+        logging.info("Continue job with timestamp %d", unixTS)
     TrainName = "FastSim_{0}_{1}_{2}".format(Gen, Proc, unixTS)
     try:
         SubmitProcessingJobs(TrainName, LocalPath, config["numevents"], config["numbjobs"], Gen, Proc, yamlFileName, batchconfig, copy_files, powheg_stage, XGridIter)
@@ -165,4 +171,4 @@ if __name__ == '__main__':
 
     userConf = aliuserconfig.LoadUserConfiguration(args.user_conf)
 
-    main(userConf, args.config, args.bat args.continue_powheg, args.powheg_stage, args.xgrid_iter)
+    main(userConf, args.config, args.batch_conf, args.continue_powheg, args.powheg_stage, args.xgrid_iter)

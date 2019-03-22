@@ -25,10 +25,11 @@ def subprocess_checkoutput(cmd):
     return subprocess.check_output(cmd, universal_newlines=True)
 
 def subprocess_cmd(command):
-    process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True)
-    proc_stdout = process.communicate()[0].strip()
+    process = subprocess.Popen("/bin/bash", stdout=subprocess.PIPE)
+    proc_stdout = process.communicate(command)[0].strip()
     logging.info(proc_stdout)
 
-def copy_to_workdir(Files, LocalDest):
-    for file in Files:
-        shutil.copy(file, LocalDest)
+def copy_to_workdir(Files):
+    for inputfile, outputfile in Files.iteritems():
+        logging.info("Copying %s to %s", inputfile, outputfile)
+        shutil.copy(inputfile, outputfile)
