@@ -138,11 +138,11 @@ def main(UserConf, yamlFileName, batchconfig, continue_powheg, powheg_stage, XGr
     if not continue_powheg:
         unixTS = int(time.time())
         copy_files = True
-        logging.info("New job with timestamp %s", unixTS)
+        logging.info("New job with timestamp {0}".format(unixTS))
     else:
         unixTS = continue_powheg
         copy_files = False
-        logging.info("Continue job with timestamp %d", unixTS)
+        logging.info("Continue job with timestamp {0}".format(unixTS))
     TrainName = "FastSim_{0}_{1}_{2}".format(Gen, Proc, unixTS)
     try:
         SubmitProcessingJobs(TrainName, LocalPath, config["numevents"], config["numbjobs"], Gen, Proc, yamlFileName, batchconfig, copy_files, powheg_stage, XGridIter)
