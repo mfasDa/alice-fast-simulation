@@ -29,7 +29,7 @@ class cernbatchtools:
     def get_batchsub(self):
         return "sbatch" if alisimtools.test_slurm() else "qsub"
 
-    def writeSimCommand(self, repo, scriptwriter, simcommand):
+    def writeSimCommand(self, repo, scriptwriter, workdir, simcommand):
         scriptwriter.write("source $HOME/powheg_herwig_env.sh\n")
         scriptwriter.write("%s\n" %simcommand)
 

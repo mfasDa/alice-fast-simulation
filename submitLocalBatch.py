@@ -42,7 +42,7 @@ def SubmitParallel(LocalDest, ExeFile, Events, Jobs, yamlFileName, batchconfig):
             myfile.write("#!/bin/bash\n")
             myfile.write(alipackagetools.GenerateComments())
             batchtools.get_batchhandler()(myfile, batchconfig, JobOutput)
-            batchtools.writeSimCommand(repo, myfile, "{LocalDest}/{ExeFile} {yamlFileName} --numevents {Events} --job-number {ijob} --batch-job lbnl3\n".format(LocalDest=LocalDest, ExeFile=ExeFile, yamlFileName=os.path.basename(yamlFileName), Events=Events, ijob=ijob))
+            batchtools.writeSimCommand(repo, myfile, LocalDest, "{LocalDest}/{ExeFile} {yamlFileName} --numevents {Events} --job-number {ijob} --batch-job lbnl3\n".format(LocalDest=LocalDest, ExeFile=ExeFile, yamlFileName=os.path.basename(yamlFileName), Events=Events, ijob=ijob))
         output = alisimtools.subprocess_checkoutput([batchtools.get_batchsub(), RunJobFileName])
         print(output)
 
@@ -64,7 +64,7 @@ def SubmitParallelPowheg(LocalDest, ExeFile, Events, Jobs, yamlFileName, batchco
             myfile.write("#!/bin/bash\n")
             myfile.write(alipackagetools.GenerateComments())
             batchtools.get_batchhandler()(myfile, batchconfig, JobOutput)
-            batchtools.writeSimCommand(repo, myfile, "{LocalDest}/{ExeFile} {LocalDest}/{yamlFileName} --numevents {Events} --job-number {ijob} --powheg-stage {PowhegStage} --batch-job lbnl3\n".format(LocalDest=LocalDest, ExeFile=ExeFile, yamlFileName=os.path.basename(yamlFileName), Events=Events, ijob=ijob, PowhegStage=PowhegStage))
+            batchtools.writeSimCommand(repo, myfile, LocalDest, "{LocalDest}/{ExeFile} {LocalDest}/{yamlFileName} --numevents {Events} --job-number {ijob} --powheg-stage {PowhegStage} --batch-job lbnl3\n".format(LocalDest=LocalDest, ExeFile=ExeFile, yamlFileName=os.path.basename(yamlFileName), Events=Events, ijob=ijob, PowhegStage=PowhegStage))
         os.chmod(RunJobFileName, 0755)
         output = alisimtools.subprocess_checkoutput([batchtools.get_batchsub(), RunJobFileName])
         logging.info("%s", output)

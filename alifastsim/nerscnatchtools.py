@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import yaml
 from alifastsim import Tools as alisimtools
 
 def is_nersc_system():
@@ -23,11 +24,19 @@ class nerscbatchtools:
             return "Environment is not configured correctly!"
 
     def configbatch_slurm(self, scriptwriter, batchconfig, outputfile):
-        scriptwriter.write("#SBATCH --qos=shared\n")
+        breader = open(batchconfig, "r")
+        bcdata = yaml.load(breader)
+        breader.close()
+        scriptwriter.write("#SBATCH --qos=%s\n" %bcdata["qos"])
+        if bcdata["qos"] != "shared":
+                scriptwriter.write("#SBATCH --nodes=1\n")
+        else:
+                scriptwriter.write("#SBATCH --ntasks=1\n")
+                scriptwriter.write("#SBATCH --cpus-per-task=1\n")
         scriptwriter.write("#SBATCH --output=%s\n" %outputfile)
         scriptwriter.write("#SBATCH --image=docker:mfasel/cc7-alice:latest\n")
         scriptwriter.write("#SBATCH --license=cscratch1,project\n") 
-        scriptwriter.write("#SBATCH --time=%s\n" %batchconfig["time"])
+        scriptwriter.write("#SBATCH --time=%s\n" %bcdata["time"])
 
     def get_batchhandler(self):
         return self.configbatch_slurm
@@ -35,10 +44,10 @@ class nerscbatchtools:
     def get_batchsub(self):
         return "sbatch"
 
-    def writeSimCommand(self, repo, scriptwriter, simcommand):
-        scriptwriter.write("shifter %s/nersc/shifterrun.sh %s/powheg_herwig_env.sh \"%s\"\n" %(repo, os.environ["CSCRATCH"], simcommand))
+    def writeSimCommand(self, repo, scriptwriter, workdir, simcommand):
+        scriptwriter.write("shifter %s/nersc/shifterrun.sh %s/powheg_herwig_env.sh %s \"%s\"\n" %(repo, os.environ["CSCRATCH"], workdir, simcommand))
 
     def run_build(self, repo, workdir):
         currentdir = os.getcwd()
-        alisimtools.subprocess_cmd("shifter --image=docker:mfasel/cc7-alice:latest %s/nersc/shifterbuild.sh %s/powheg_herwig_env.sh %s" %(repo, os.environ["CSCRATCH"], workdir))
+        subprocess.call("shifter --image=docker:mfasel/cc7-alice:latest %s/nersc/shifterbuild.sh %s/powheg_herwig_env.sh %s" %(repo, os.environ["CSCRATCH"], workdir), shell=True)
         os.chdir(currentdir)
