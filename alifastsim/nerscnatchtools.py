@@ -44,10 +44,10 @@ class nerscbatchtools:
     def get_batchsub(self):
         return "sbatch"
 
-    def writeSimCommand(self, repo, scriptwriter, workdir, simcommand):
-        scriptwriter.write("shifter %s/nersc/shifterrun.sh %s/powheg_herwig_env.sh %s \"%s\"\n" %(repo, os.environ["CSCRATCH"], workdir, simcommand))
+    def writeSimCommand(self, repo, scriptwriter, envscript, workdir, simcommand):
+        scriptwriter.write("shifter %s/nersc/shifterrun.sh %s/%s %s \"%s\"\n" %(repo, os.environ["CSCRATCH"], envscript, workdir, simcommand))
 
-    def run_build(self, repo, workdir):
+    def run_build(self, repo, workdir, envscript):
         currentdir = os.getcwd()
-        subprocess.call("shifter --image=docker:mfasel/cc7-alice:latest %s/nersc/shifterbuild.sh %s/powheg_herwig_env.sh %s" %(repo, os.environ["CSCRATCH"], workdir), shell=True)
+        subprocess.call("shifter --image=docker:mfasel/cc7-alice:latest %s/nersc/shifterbuild.sh %s/%s %s" %(repo, os.environ["CSCRATCH"], envscript, workdir), shell=True)
         os.chdir(currentdir)

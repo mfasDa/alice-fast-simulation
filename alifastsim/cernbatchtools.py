@@ -29,11 +29,11 @@ class cernbatchtools:
     def get_batchsub(self):
         return "sbatch" if alisimtools.test_slurm() else "qsub"
 
-    def writeSimCommand(self, repo, scriptwriter, workdir, simcommand):
-        scriptwriter.write("source $HOME/powheg_herwig_env.sh\n")
+    def writeSimCommand(self, repo, scriptwriter, envscript, workdir, simcommand):
+        scriptwriter.write("source $HOME/%s\n" %envscript)
         scriptwriter.write("%s\n" %simcommand)
 
-    def run_build(self, repo, workdir):
+    def run_build(self, repo, workdir, envscript):
         currentdir = os.getcwd()
-        subprocess.call("%s/nersc/shifterbuild.sh %s/powheg_herwig_env.sh %s" %(repo,os.environ["HOME"],workdir), shell=True);
+        subprocess.call("%s/nersc/shifterbuild.sh %s/%s %s" %(repo,os.environ["HOME"],envscript,workdir), shell=True)
         os.chdir(currentdir)
