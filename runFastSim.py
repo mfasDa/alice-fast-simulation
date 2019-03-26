@@ -220,7 +220,7 @@ def Powheg(LHEfile, proc, powheg_stage, job_number, load_packages_separately):
     
     return powheg_result
 
-def RunHerwig(nevents, pdfid, load_packages_separately):
+def RunHerwig(nevents, pdfid, job_number, load_packages_separately):
     print("Running HERWIG simulation!")
 
     rnd = random.randint(0, 1073741824)  # 2^30
@@ -292,7 +292,7 @@ def RunHerwig(nevents, pdfid, load_packages_separately):
     else:
         if TestHerwig():
             print("Running HERWIG...")
-            with open("herwig_stdout.log", "w") as myfile:
+            with open("herwig_stdout_%d.log" %(job_number), "w") as myfile:
                 # Verify that PDF is installed
                 pdfsetlist = subprocess.check_output(["lhapdf", "list", "--installed"]).splitlines()
                 if pdfname in pdfsetlist:
@@ -309,7 +309,7 @@ def RunHerwig(nevents, pdfid, load_packages_separately):
         else:
             print("HERWIG not found. Aborting...")
 
-    hepfile = "events.hepmc"
+    hepfile = "events_%04d.hepmc" %job_number
     if os.path.isfile(hepfile):
         nevents_generated = GetNumberOfHerwigEvents(hepfile)
     else:
@@ -329,7 +329,7 @@ def TestHerwig():
     print("Herwig found in '{}'".format(herwigPath))
     return True
 
-def Herwig(HEPfile, nevents, pdfid, load_packages_separately):
+def Herwig(HEPfile, nevents, pdfid, job_number, load_packages_separately):
     if HEPfile:
         nevents_generated = GetNumberOfHerwigEvents(HEPfile)
         if nevents_generated > 0:
@@ -339,7 +339,7 @@ def Herwig(HEPfile, nevents, pdfid, load_packages_separately):
             print("No events found in file {}!".format(HEPfile))
             exit(1)
     else:
-        herwig_result = RunHerwig(nevents, pdfid, load_packages_separately)
+        herwig_result = RunHerwig(nevents, pdfid, job_number, load_packages_separately)
     
     return herwig_result
 
@@ -423,7 +423,7 @@ def main(events, powheg_stage, job_number, yamlConfigFile, batch_job, input_even
             events = max_events
     
     if "herwig" in gen:
-        herwig_result = Herwig(input_events, events, config["lhans"], load_packages_separately)
+        herwig_result = Herwig(input_events, events, config["lhans"], job_number, load_packages_separately)
         HEPfile = herwig_result.hep_file
         max_events = herwig_result.events_generated
         if max_events == 0:
