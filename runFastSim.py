@@ -301,9 +301,9 @@ def RunHerwig(nevents, pdfid, load_packages_separately):
                     os.environ["LHAPDF_DATA_PATH"] = "./"
                     subprocess.call(["lhapdf", "--pdfdir=./", "install", pdfname], stdout=myfile, stderr=myfile)
 
-                subprocess.call(["Herwig", "read", "herwig.in"], stdout=myfile, stderr=myfile)
+                subprocess.call(["Herwig", "--repo=%s/share/Herwig/HerwigDefaults.rpo" %(os.environ["HERWIG_ROOT"]), "read", "herwig.in"], stdout=myfile, stderr=myfile)
                 if os.path.isfile("herwig.run"):
-                    subprocess.call(["Herwig", "run", "herwig.run", "-s", str(rnd), "-N", str(nevents)], stdout=myfile, stderr=myfile)
+                    subprocess.call(["Herwig", "--repo=%s/share/Herwig/HerwigDefaults.rpo" %(os.environ["HERWIG_ROOT"]), "run", "herwig.run", "-s", str(rnd), "-N", str(nevents)], stdout=myfile, stderr=myfile)
                 else:
                     print("Something went wrong in the HERWIG run configuration.")
         else:
