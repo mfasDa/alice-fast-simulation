@@ -234,6 +234,7 @@ def RunHerwig(nevents, pdfid, job_number, load_packages_separately):
         os.environ["HERWIG_ROOT"] = os.environ["HERWIGPATH"]
 
     pdfname = lhapdf_utils.GetPDFName(pdfid, False)
+    hepfile = "events.hepmc" %job_number
     if load_packages_separately:
         herwig_pkg = "VO_ALICE@Herwig::v7.1.2-alice1-1"
         print("Starting a separate shell to load the Herwig package...")
@@ -300,7 +301,13 @@ def RunHerwig(nevents, pdfid, job_number, load_packages_separately):
                 else:
                     os.environ["LHAPDF_DATA_PATH"] = "./"
                     subprocess.call(["lhapdf", "--pdfdir=./", "install", pdfname], stdout=myfile, stderr=myfile)
-
+                # generate herwig.in file with dedicated hepevent file
+                hwgfile = "herwig_%04d.in" %job_number
+                hepfile = "events_%04d.hepmc" %job_number
+                with open("herwig.in", "r") as reader and open(hwgfile, "w") as writer:
+                    for line in reader:
+                        if "events.hepmc" in line:
+                            line.replace("events.hepmc", hepfile)
                 subprocess.call(["Herwig", "--repo=%s/share/Herwig/HerwigDefaults.rpo" %(os.environ["HERWIG_ROOT"]), "read", "herwig.in"], stdout=myfile, stderr=myfile)
                 if os.path.isfile("herwig.run"):
                     subprocess.call(["Herwig", "--repo=%s/share/Herwig/HerwigDefaults.rpo" %(os.environ["HERWIG_ROOT"]), "run", "herwig.run", "-s", str(rnd), "-N", str(nevents)], stdout=myfile, stderr=myfile)
@@ -309,7 +316,6 @@ def RunHerwig(nevents, pdfid, job_number, load_packages_separately):
         else:
             print("HERWIG not found. Aborting...")
 
-    hepfile = "events_%04d.hepmc" %job_number
     if os.path.isfile(hepfile):
         nevents_generated = GetNumberOfHerwigEvents(hepfile)
     else:
