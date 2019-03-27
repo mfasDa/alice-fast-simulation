@@ -1,16 +1,16 @@
-name: HERWIG_DIJET_LO_7TeV
-numevents: 5000
-numbjobs: 40
+name: HERWIG_DIJET_LO_13TeV
+numevents: 50000
+numbjobs: 400
 gen: herwig
 proc: dijet_lo
 beam_type: pp
 lhans: 11000
 ebeam1: 6500
 ebeam2: 6500
-add_d_mesons: yes
+add_d_mesons: no
 extended_event_info: yes
 grid_config:
-  load_packages_separately: no
+  load_packages_separately: yes
   ttl: 50000
   max_files_per_job: 20
-  aliphysics: vAN-20190312_ROOT6-1
+  aliphysics: vAN-20180706-1
