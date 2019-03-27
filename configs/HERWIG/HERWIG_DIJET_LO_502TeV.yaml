@@ -1,0 +1,16 @@
+name: HERWIG_DIJET_LO_502TeV
+numevents: 50000
+numbjobs: 400
+gen: herwig
+proc: dijet_lo
+beam_type: pp
+lhans: 11000
+ebeam1: 2510
+ebeam2: 2510
+add_d_mesons: no
+extended_event_info: yes
+grid_config:
+  load_packages_separately: yes
+  ttl: 50000
+  max_files_per_job: 20
+  aliphysics: vAN-20180706-1
