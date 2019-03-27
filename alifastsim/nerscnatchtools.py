@@ -33,6 +33,8 @@ class nerscbatchtools:
         else:
                 scriptwriter.write("#SBATCH --ntasks=1\n")
                 scriptwriter.write("#SBATCH --cpus-per-task=1\n")
+        if os.environ["NERSC_HOST"] == "cori":
+                scriptwriter.write("#SBATCH --constraint=haswell\n")
         scriptwriter.write("#SBATCH --output=%s\n" %outputfile)
         scriptwriter.write("#SBATCH --image=docker:mfasel/cc7-alice:latest\n")
         scriptwriter.write("#SBATCH --license=cscratch1,project\n") 
