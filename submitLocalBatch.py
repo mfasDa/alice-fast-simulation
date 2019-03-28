@@ -15,7 +15,8 @@ from alifastsim import GenerateHerwigInput as aliherwigtools
 from alifastsim import GeneratePowhegInput as alipowhegtools
 from alifastsim import Tools as alisimtools
 from alifastsim import cernbatchtools as alicernsub
-from alifastsim import nerscnatchtools as alinerscsub
+from alifastsim import nerscbatchtools as alinerscsub
+from alifastsim import simtask as alisimtask
 from alifastsim import PackageTools as alipackagetools
 
 repo = os.path.abspath(os.path.dirname(sys.argv[0]))
@@ -35,17 +36,13 @@ def get_batchtools():
 
 def SubmitParallel(LocalDest, ExeFile, Events, Jobs, yamlFileName, batchconfig, envscript):
     batchtools = get_batchtools()
-    for ijob in range(0, Jobs):
-        JobDir = LocalDest
-        JobOutput = "{}/JobOutput_{:04d}.log".format(JobDir, ijob)
-        RunJobFileName = "{}/RunJob_{:04d}.sh".format(JobDir, ijob)
-        with open(RunJobFileName, "w") as myfile:
-            myfile.write("#!/bin/bash\n")
-            myfile.write(alipackagetools.GenerateComments())
-            batchtools.get_batchhandler()(myfile, batchconfig, JobOutput)
-            batchtools.writeSimCommand(repo, myfile, envscript, LocalDest, "{LocalDest}/{ExeFile} {yamlFileName} --numevents {Events} --job-number {ijob} --batch-job lbnl3\n".format(LocalDest=LocalDest, ExeFile=ExeFile, yamlFileName=os.path.basename(yamlFileName), Events=Events, ijob=ijob))
-        output = alisimtools.subprocess_checkoutput([batchtools.get_batchsub(), RunJobFileName])
-        print(output)
+    JobRunscriptTemplate = "JobOutput_RANK.log"
+    JobLogfileTemplate = "RunJob_RANK.sh"
+
+    simtask_optionals = {"--numevents": "{Events}".format(Events=Events), "--batch-job": "lbnl3"}
+    simtask_defaults = ["{LocalDest}/{yamlFileName}".format(LocalDest=LocalDest, yamlFileName=os.path.basename(yamlFileName))]
+    mysimtask = alisimtask.simtask("{LocalDest}/{ExeFile}".format(LocalDest=LocalDest, ExeFile=ExeFile), simtask_defaults, simtask_optionals, "--job-number")
+    batchtools.submitJobs(repo, mysimtask, LocalDest, JobRunscriptTemplate, JobLogfileTemplate, envscript, batchconfig, Jobs, 0)
 
 def SubmitParallelPowheg(LocalDest, ExeFile, Events, Jobs, yamlFileName, batchconfig, envscript, PowhegStage, XGridIter):
     batchtools = get_batchtools()
@@ -53,22 +50,18 @@ def SubmitParallelPowheg(LocalDest, ExeFile, Events, Jobs, yamlFileName, batchco
     shutil.copy("{}/{}".format(LocalDest, input_file_name), "{}/powheg.input".format(LocalDest))
     njobconfigStage = {1: 10, 2: 20, 3: 10, 4: Jobs} # Dictionary in stage:jobs
 
-    for ijob in range(1, njobconfigStage[PowhegStage] + 1):
-        JobDir = LocalDest
-        if PowhegStage == 1:
-            JobOutput = "{}/JobOutput_Stage_{}_XGridIter_{}_{:04d}.log".format(JobDir, PowhegStage, XGridIter, ijob)
-            RunJobFileName = "{}/RunJob_Stage_{}_XGridIter_{}_{:04d}.sh".format(JobDir, PowhegStage, XGridIter, ijob)
-        else:
-            JobOutput = "{}/JobOutput_Stage_{}_{:04d}.log".format(JobDir, PowhegStage, ijob)
-            RunJobFileName = "{}/RunJob_{}_{:04d}.sh".format(JobDir, PowhegStage, ijob)
-        with open(RunJobFileName, "w") as myfile:
-            myfile.write("#!/bin/bash\n")
-            myfile.write(alipackagetools.GenerateComments())
-            batchtools.get_batchhandler()(myfile, batchconfig, JobOutput)
-            batchtools.writeSimCommand(repo, myfile, envscript, LocalDest, "{LocalDest}/{ExeFile} {LocalDest}/{yamlFileName} --numevents {Events} --job-number {ijob} --powheg-stage {PowhegStage} --batch-job lbnl3\n".format(LocalDest=LocalDest, ExeFile=ExeFile, yamlFileName=os.path.basename(yamlFileName), Events=Events, ijob=ijob, PowhegStage=PowhegStage))
-        os.chmod(RunJobFileName, 0755)
-        output = alisimtools.subprocess_checkoutput([batchtools.get_batchsub(), RunJobFileName])
-        logging.info("%s", output)
+    simtask_optionals = {"--numevents": "{Events}".format(Events=Events), "--powheg-stage": "{PowhegStage}".format(PowhegStage=PowhegStage), "--batch-job": "lbnl3"}
+    simtask_defaults = ["{LocalDest}/{yamlFileName}".format(LocalDest=LocalDest, yamlFileName=os.path.basename(yamlFileName))]
+    mysimtask = alisimtask.simtask("{LocalDest}/{ExeFile}".format(LocalDest=LocalDest, ExeFile=ExeFile), simtask_defaults, simtask_optionals, "--job-number")
+    JobRunscriptTemplate = ""
+    JobLogfileTemplate = ""
+    if PowhegStage == 1:
+        JobRunscriptTemplate = "RunJob_Stage_{}_XGridIter_{}_RANK.sh".format(PowhegStage, XGridIter)
+        JobLogfileTemplate = "JobOutput_Stage_{}_XGridIter_{}_RANK.log".format(PowhegStage, XGridIter)
+    else:
+        JobRunscriptTemplate = "RunJob_{}_RANK.sh".format(PowhegStage)
+        JobLogfileTemplate = "JobOutput_Stage_{}_RANK.log".format(PowhegStage)
+    batchtools.submitJobs(repo, mysimtask, LocalDest, JobRunscriptTemplate, JobLogfileTemplate, envscript, batchconfig, njobconfigStage[PowhegStage], 1)
 
 def SubmitProcessingJobs(TrainName, LocalPath, Events, Jobs, Gen, Proc, yamlFileName, batchconfig, copy_files, PowhegStage, XGridIter, HerwigTune):
     logging.info("Submitting processing jobs for train {0}".format(TrainName))
