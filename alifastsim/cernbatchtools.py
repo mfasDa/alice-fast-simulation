@@ -23,6 +23,22 @@ class cernbatchtools:
         scriptwriter.write("#PBS -o %s\n" %outputfile)
         scriptwriter.write("#PBS -j oe\n")
 
+    def submitJobs(self, repo, simtask, workdir, jobscriptbase, logfilebase, envscript, batchconfig, njobs, joboffset):
+        for ijob in range(joboffset, njobs + joboffset):
+            taskjobscriptname = jobscriptbase
+            taskjobscriptname = os.path.join(workdir, taskjobscriptname.replace("RANK", "%0d" %ijob))
+            tasklogfile = logfilebase
+            tasklogfile = os.path.join(tasklogfile.replace("RANK", "%04d"))
+            with open(taskjobscriptname) as jobscriptwriter:
+                jobscriptwriter.writer("#!/bin/bash\n")
+                myfile.write(alipackagetools.GenerateComments())
+                self.get_batchsub()(jobscriptwriter, batchconfig, tasklogfile)
+                self.writeSimCommand(self, repo, envscript, workdir, simtask.create_task_command_serial(ijob))
+                jobscriptwriter.close()
+                os.chmod(taskjobscriptname, 0755)
+                output = alisimtools.subprocess_checkoutput([self.get_batchsub(), taskjobscriptname])
+                logging.info("%s", output)
+
     def get_batchhandler(self):
         return self.configbatch_slurm if alisimtools.test_slurm() else self.configbatch_pbs
    
