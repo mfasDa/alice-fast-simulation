@@ -34,10 +34,10 @@ class nerscbatchtools:
         scriptwriter.write("#SBATCH --qos=%s\n" %bcdata["qos"])
         taskspernode={"edison":24, "cori": 68}
         if bcdata["qos"] != "shared":
-                scriptwriter.write("#SBATCH --nodes=%d\n", nnodes)
+                scriptwriter.write("#SBATCH --nodes=%d\n" %nnodes)
                 scriptwriter.write("#SBATCH --tasks-per-node=%d\n" %taskspernode[nerscsystem])
                 if nerscsystem == "cori":
-                    scriptwriter.write("#SBATCH --constraint=knl")
+                    scriptwriter.write("#SBATCH --constraint=knl\n")
         else:
                 scriptwriter.write("#SBATCH --ntasks=1\n", ntasks)
                 scriptwriter.write("#SBATCH --cpus-per-task=1\n", ncpu)
@@ -57,18 +57,19 @@ class nerscbatchtools:
             #determine nodes and number of CPUs
             taskspernode={"edison":24, "cori": 68}
             nnodes = int(math.ceil(float(njobs)/float(taskspernode[nerscsystem])))
+            nslots = int(nnodes) * int(taskspernode[nerscsystem])
             taskjobscriptname = jobscriptbase
             taskjobscriptname = os.path.join(workdir, taskjobscriptname.replace("RANK", "MPI"))
             generallogfile = logfilebase
             generallogfile = os.path.join(workdir, generallogfile.replace("RANK", "ALL"))
             #submit one single mpi job
-            with open(os.path.join(workdir, taskjobscriptname)) as jobscriptwriter:
-                jobscriptwriter.writer("#!/bin/bash\n")
+            with open(taskjobscriptname, "w") as jobscriptwriter:
+                jobscriptwriter.write("#!/bin/bash\n")
                 jobscriptwriter.write(alipackagetools.GenerateComments())
                 self.configbatch_slurm(jobscriptwriter, batchconfig, nnodes, 0, 0, generallogfile)
-                self.writeSimCommandMPI(repo, jobscriptwriter, njobs, joboffset, envscript, workdir, simtask.create_task_command_mpi(), logfilebase)
+                self.writeSimCommandMPI(repo, jobscriptwriter, nslots, njobs, joboffset, envscript, workdir, simtask.create_task_command_mpi(), os.path.join(workdir,logfilebase))
                 jobscriptwriter.close()
-                os.chmod(os.path.join(workdir, taskjobscriptname), 0755)
+                os.chmod(taskjobscriptname, 0755)
                 output = alisimtools.subprocess_checkoutput([self.get_batchsub(), taskjobscriptname])
                 logging.info("%s", output)
 
@@ -76,16 +77,16 @@ class nerscbatchtools:
             #submit multiple serial jobs
             for ijob in range(joboffset, njobs + joboffset):
                 taskjobscriptname = jobscriptbase
-                taskjobscriptname = taskjobscriptname.replace("RANK", "%0d" %ijob)
+                taskjobscriptname = os.path.join(workdir, taskjobscriptname.replace("RANK", "%0d" %ijob))
                 tasklogfile = logfilebase
-                tasklogfile = tasklogfile.replace("RANK", "%04d" %ijob)
-                with open(os.path.join(workdir, taskjobscriptname)) as jobscriptwriter:
+                tasklogfile = os.path.join(workdir, tasklogfile.replace("RANK", "%04d" %ijob))
+                with open(taskjobscriptname, "w") as jobscriptwriter:
                     jobscriptwriter.writer("#!/bin/bash\n")
                     jobscriptwriter.write(alipackagetools.GenerateComments())
                     self.configbatch_slurm(jobscriptwriter, batchconfig, 1, 1, 1, tasklogfile)
                     self.writeSimCommand(self, repo, jobscriptwriter, envscript, workdir, simtask.create_task_command_serial(ijob))
                     jobscriptwriter.close()
-                    os.chmod(os.path.join(workdir, taskjobscriptname), 0755)
+                    os.chmod(taskjobscriptname, 0755)
                     output = alisimtools.subprocess_checkoutput([self.get_batchsub(), taskjobscriptname])
                     logging.info("%s", output)
                     
@@ -99,8 +100,8 @@ class nerscbatchtools:
     def writeSimCommand(self, repo, scriptwriter, envscript, workdir, simcommand):
         scriptwriter.write("shifter %s/nersc/shifterrun.sh %s/%s %s \"%s\"\n" %(repo, os.environ["CSCRATCH"], envscript, workdir, simcommand))
 
-    def writeSimCommandMPI(self, repo, scriptwriter, njobs, joboffset, envscript, workdir, simcommand, logfiletemplate):
-        scriptwriter.write("srun shifter %s/nersc/mpiwrapper.py %s/%s %d %d %s \"%s\" %s\n" %(repo, os.environ["CSCRATCH"], njobs, joboffset, envscript, workdir, simcommand, logfiletemplate))
+    def writeSimCommandMPI(self, repo, scriptwriter, nslots, njobs, joboffset, envscript, workdir, simcommand, logfiletemplate):
+        scriptwriter.write("shifter /usr/lib64/openmpi/bin/mpirun -n %d  %s/nersc/mpiwrapper.py %d %d %s/%s %s \"%s\" %s\n" %(nslots, repo, njobs, joboffset, os.environ["CSCRATCH"], envscript, workdir, simcommand, logfiletemplate))
 
     def run_build(self, repo, workdir, envscript):
         currentdir = os.getcwd()
