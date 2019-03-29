@@ -11,12 +11,12 @@ class simtask:
     def create_task_command_serial(self, jobid):
         taskcommand = self.__create_task_command_main()
         taskcommand += " %s %d" %(self.__jobidstring, jobid)
-        return "\"%s\"" %taskcommand
+        return "%s" %taskcommand
 
     def create_task_command_mpi(self):
         taskcommand = self.__create_task_command_main()
         taskcommand += " %s RANK" %(self.__jobidstring)
-        return "\"%s\"" %taskcommand
+        return "%s" %taskcommand
 
     def __create_task_command_main(self):
         taskcommand = self.__executable

@@ -36,8 +36,8 @@ def get_batchtools():
 
 def SubmitParallel(LocalDest, ExeFile, Events, Jobs, yamlFileName, batchconfig, envscript):
     batchtools = get_batchtools()
-    JobRunscriptTemplate = "JobOutput_RANK.log"
-    JobLogfileTemplate = "RunJob_RANK.sh"
+    JobRunscriptTemplate = "RunJob_RANK.sh"
+    JobLogfileTemplate = "JobOutput_RANK.log"
 
     simtask_optionals = {"--numevents": "{Events}".format(Events=Events), "--batch-job": "lbnl3"}
     simtask_defaults = ["{LocalDest}/{yamlFileName}".format(LocalDest=LocalDest, yamlFileName=os.path.basename(yamlFileName))]

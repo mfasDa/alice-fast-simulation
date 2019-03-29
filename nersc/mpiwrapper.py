@@ -1,4 +1,4 @@
-#! /usr/bin/env python!
+#! /usr/bin/env python
 from mpi4py import MPI
 import logging
 import os
@@ -8,7 +8,8 @@ import sys
 repo = os.path.dirname(sys.argv[0])
 
 def run_local_job(workdir, envscript, task, logfile):
-    subprocess.call("%s/shifterrun.sh %s %s %s >> %s" %(repo, envscript, workdir, task, logfile), shell=True)
+    logging.info("Running \"%s\", logging to %s", task, logfile)
+    subprocess.call("%s/shifterrun.sh %s %s \"%s\" &> %s" %(repo, envscript, workdir, task, logfile), shell=True)
 
 def adapt_jobid(content, jobid):
     result = content
@@ -25,7 +26,7 @@ if __name__ == "__main__":
     workdir = sys.argv[4]
     task = sys.argv[5]
     logfiletemplate = sys.argv[6]
-    workertasks = adapt_jobid(task, MPI.COMM_WORLD.Get_rank())
+    workertask = adapt_jobid(task, MPI.COMM_WORLD.Get_rank())
     logfile = adapt_jobid(logfiletemplate, MPI.COMM_WORLD.Get_rank())
-    run_local_job(workdir, envscript, task, logfile)
+    run_local_job(workdir, envscript, workertask, logfile)
     logging.info("Worker %d done", MPI.COMM_WORLD.Get_rank())
