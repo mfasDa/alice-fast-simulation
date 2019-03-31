@@ -9,7 +9,7 @@ repo = os.path.dirname(sys.argv[0])
 
 def run_local_job(workdir, envscript, task, logfile):
     logging.info("Running \"%s\", logging to %s", task, logfile)
-    subprocess.call("%s/shifterrun.sh %s %s \"%s\" &> %s" %(repo, envscript, workdir, task, logfile), shell=True)
+    subprocess.call("shifter %s/shifterrun.sh %s %s \"%s\" &> %s" %(repo, envscript, workdir, task, logfile), shell=True)
 
 def adapt_jobid(content, jobid):
     result = content

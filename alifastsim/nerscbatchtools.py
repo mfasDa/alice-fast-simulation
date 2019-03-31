@@ -67,6 +67,7 @@ class nerscbatchtools:
                 jobscriptwriter.write("#!/bin/bash\n")
                 jobscriptwriter.write(alipackagetools.GenerateComments())
                 self.configbatch_slurm(jobscriptwriter, batchconfig, nnodes, 0, 0, generallogfile)
+                jobscriptwriter.write("module load cray-python/2.7.15.1\n")  # python with mpi, needed for srun
                 self.writeSimCommandMPI(repo, jobscriptwriter, nslots, njobs, joboffset, envscript, workdir, simtask.create_task_command_mpi(), os.path.join(workdir,logfilebase))
                 jobscriptwriter.close()
                 os.chmod(taskjobscriptname, 0755)
@@ -101,7 +102,7 @@ class nerscbatchtools:
         scriptwriter.write("shifter %s/nersc/shifterrun.sh %s/%s %s \"%s\"\n" %(repo, os.environ["CSCRATCH"], envscript, workdir, simcommand))
 
     def writeSimCommandMPI(self, repo, scriptwriter, nslots, njobs, joboffset, envscript, workdir, simcommand, logfiletemplate):
-        scriptwriter.write("shifter /usr/lib64/openmpi/bin/mpirun -n %d  %s/nersc/mpiwrapper.py %d %d %s/%s %s \"%s\" %s\n" %(nslots, repo, njobs, joboffset, os.environ["CSCRATCH"], envscript, workdir, simcommand, logfiletemplate))
+        scriptwriter.write("srun -n %d python %s/nersc/mpiwrapper.py %d %d %s/%s %s \"%s\" %s\n" %(nslots, repo, njobs, joboffset, os.environ["CSCRATCH"], envscript, workdir, simcommand, logfiletemplate))
 
     def run_build(self, repo, workdir, envscript):
         currentdir = os.getcwd()
