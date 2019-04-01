@@ -39,8 +39,8 @@ class nerscbatchtools:
                 if nerscsystem == "cori":
                     scriptwriter.write("#SBATCH --constraint=knl\n")
         else:
-                scriptwriter.write("#SBATCH --ntasks=1\n", ntasks)
-                scriptwriter.write("#SBATCH --cpus-per-task=1\n", ncpu)
+                scriptwriter.write("#SBATCH --ntasks=%d\n" %ntasks)
+                scriptwriter.write("#SBATCH --cpus-per-task=%d\n" %ncpu)
         scriptwriter.write("#SBATCH --output=%s\n" %outputfile)
         scriptwriter.write("#SBATCH --image=docker:mfasel/cc7-alice:latest\n")
         scriptwriter.write("#SBATCH --license=cscratch1,project\n") 
@@ -82,10 +82,10 @@ class nerscbatchtools:
                 tasklogfile = logfilebase
                 tasklogfile = os.path.join(workdir, tasklogfile.replace("RANK", "%04d" %ijob))
                 with open(taskjobscriptname, "w") as jobscriptwriter:
-                    jobscriptwriter.writer("#!/bin/bash\n")
+                    jobscriptwriter.write("#!/bin/bash\n")
                     jobscriptwriter.write(alipackagetools.GenerateComments())
                     self.configbatch_slurm(jobscriptwriter, batchconfig, 1, 1, 1, tasklogfile)
-                    self.writeSimCommand(self, repo, jobscriptwriter, envscript, workdir, simtask.create_task_command_serial(ijob))
+                    self.writeSimCommand(repo, jobscriptwriter, envscript, workdir, simtask.create_task_command_serial(ijob))
                     jobscriptwriter.close()
                     os.chmod(taskjobscriptname, 0755)
                     output = alisimtools.subprocess_checkoutput([self.get_batchsub(), taskjobscriptname])
