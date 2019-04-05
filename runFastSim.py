@@ -460,8 +460,12 @@ def main(events, powheg_stage, job_number, yamlConfigFile, batch_job, input_even
             shell.stdin.write("aliroot -b -l -q 'start_simulation.C(\"{0}\", {1}, \"{2}\", \"{3}\", {4}, \"{5}\", \"{6}\", \"{7}\", {8}, {9}, {10}, {11}, {12}, {13}, {14})'\n".format(fname, events, proc, gen, rnd, LHEfile, HEPfile, beamType, ebeam1, ebeam2, int(always_d_mesons), int(extended_event_info), minpthard, maxpthard, debug_level))
             shell.communicate()
     else:
-        print("Compiling analysis code...")
-        subprocess.call(["make"])
+        if not os.path.exists("AnalysisCode.so"):
+            # Avoid that multiple jobs compile at the same time
+            print("Compiling analysis code...")
+            subprocess.call(["make"])
+        else:
+            print("Not compiling again as the library was already found ...")
 
         if batch_job == "lbnl3":
             work_dir = "output/{}".format(fname)
