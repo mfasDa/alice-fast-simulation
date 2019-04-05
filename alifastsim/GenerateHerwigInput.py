@@ -39,8 +39,8 @@ def GenerateHerwigInput(config_params, outputdir, events):
             myfile.write("set /Herwig/UnderlyingEvent/MPIHandler:IdenticalToUE -1\n")
         elif "pthard" in config_params["proc"]:
             pthardbins = {1: [10., 20.], 2: [20., 30.]}
-            procstr=config_params["proc"]te
-            pthardbin = int(procstr.replace("pthard_"))
+            procstr=config_params["proc"]
+            pthardbin = int(procstr.replace("pthard_", ""))
             myfile.write("insert /Herwig/MatrixElements/SubProcess:MatrixElements[0] /Herwig/MatrixElements/MEQCD2to2\n")
             myfile.write("set /Herwig/Cuts/JetKtCut:MinKT %f*GeV\n" %(pthardbins[pthard][0]))
             myfile.write("set /Herwig/Cuts/JetKtCut:MaxKT %f*GeV\n" %(pthardbins[pthard][1]))
