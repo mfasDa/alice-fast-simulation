@@ -1,4 +1,4 @@
-name: POWHEG_PYTHIA6_DIJET_BORNKT10_BORNSUPP20_7TeV
+name: POWHEG_PYTHIA6_DIJET_BORNKT20_BORNSUPP20_13TeV
 numevents: 25000
 numbjobs: 1600
 gen: powheg+pythia6
@@ -10,7 +10,7 @@ ebeam2: 6500
 add_d_mesons: no
 extended_event_info: yes
 powheg_config:
-  bornktmin: 10
+  bornktmin: 20
   bornsuppfact: 20
 grid_config:
   ttl: 80000

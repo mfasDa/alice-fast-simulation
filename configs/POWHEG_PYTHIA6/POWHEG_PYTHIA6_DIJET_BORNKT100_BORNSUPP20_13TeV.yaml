@@ -10,7 +10,7 @@ ebeam2: 6500
 add_d_mesons: no
 extended_event_info: yes
 powheg_config:
-  bornktmin: 10
+  bornktmin: 100
   bornsuppfact: 20
 grid_config:
   ttl: 80000
