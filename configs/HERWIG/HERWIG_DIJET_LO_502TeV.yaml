@@ -1,6 +1,6 @@
 name: HERWIG_DIJET_LO_502TeV
-numevents: 50000
-numbjobs: 400
+numevents: 25000
+numbjobs: 1600
 gen: herwig
 proc: dijet_lo
 beam_type: pp
