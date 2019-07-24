@@ -307,6 +307,10 @@ void OnTheFlySimulationGenerator::AddJetTree(const char* file_name)
   }
 
  
+AliEmcalJetTask* pJetTaskFull01E = AliEmcalJetTask::AddTaskEmcalJet("mcparticles", "", AliJetContainer::antikt_algorithm, 0.1, AliJetContainer::kFullJet, 0., 0., 0.1, AliJetContainer::E_scheme, "Jet", 0., kFALSE, kFALSE);
+  pJetTaskFull01E->SetVzRange(-999,999);
+  pJetTaskFull01E->SetNeedEmcalGeom(kFALSE);
+  pJetTaskFull01E->SetUseBuiltinEventSelection(kTRUE);
 
 AliEmcalJetTask* pJetTaskFull02E = AliEmcalJetTask::AddTaskEmcalJet("mcparticles", "", AliJetContainer::antikt_algorithm, 0.2, AliJetContainer::kFullJet, 0., 0., 0.1, AliJetContainer::E_scheme, "Jet", 0., kFALSE, kFALSE);
   pJetTaskFull02E->SetVzRange(-999,999);
@@ -331,6 +335,19 @@ AliEmcalJetTask* pJetTaskFull06E = AliEmcalJetTask::AddTaskEmcalJet("mcparticles
   pJetTaskFull06E->SetUseBuiltinEventSelection(kTRUE);
 
 
+ AliAnalysisTaskEmcalJetShapesMC* pJetShape0 = AliAnalysisTaskEmcalJetShapesMC::AddTaskJetShapesMC("Jet_AKTFullR010_mcparticles_pT0000_E_scheme",0.1, 0.1, "mcparticles","TPC","V0M",1<<30,"","","MC", "", AliAnalysisTaskEmcalJetShapesMC::kGenShapes, AliAnalysisTaskEmcalJetShapesMC::kNoSub, AliAnalysisTaskEmcalJetShapesMC::kInclusive);
+  pJetShape0->SetNeedEmcalGeom(kFALSE);
+  pJetShape0->SetCentralitySelectionOn(kFALSE);
+  pJetShape0->SetIsPythia(kTRUE);
+  pJetShape0->SetJetPtThreshold(10);
+  pJetShape0->SetUseBuiltinEventSelection(kTRUE);
+  pJetShape0->SetForceBeamType(AliAnalysisTaskEmcal::kpp);
+  pJetShape0->SetGeneratePythiaInfoObject(kTRUE); 
+  pJetShape0->SetGetPtHardBinFromPath(false);
+  pJetShape0->SetOptionalPartonInfo(kTRUE);
+  AliJetContainer *cont0 = pJetShape0->GetJetContainer(0);
+  cont0->SetJetRadius(0.1);
+  cont0->SetJetAcceptanceType(AliJetContainer::kTPCfid);
   
  AliAnalysisTaskEmcalJetShapesMC* pJetShape1 = AliAnalysisTaskEmcalJetShapesMC::AddTaskJetShapesMC("Jet_AKTFullR020_mcparticles_pT0000_E_scheme",0.2, 0.2, "mcparticles","TPC","V0M",1<<30,"","","MC", "", AliAnalysisTaskEmcalJetShapesMC::kGenShapes, AliAnalysisTaskEmcalJetShapesMC::kNoSub, AliAnalysisTaskEmcalJetShapesMC::kInclusive);
   pJetShape1->SetNeedEmcalGeom(kFALSE);
@@ -383,7 +400,7 @@ AliAnalysisTaskEmcalJetShapesMC* pJetShape4 = AliAnalysisTaskEmcalJetShapesMC::A
   pJetShape4->SetForceBeamType(AliAnalysisTaskEmcal::kpp);
   pJetShape4->SetGeneratePythiaInfoObject(kTRUE); 
   pJetShape4->SetGetPtHardBinFromPath(false);
-  pJetShape4->SetOptionalPartonInfo(kFALSE);
+  pJetShape4->SetOptionalPartonInfo(kTRUE);
   AliJetContainer *cont4 = pJetShape4->GetJetContainer(0);
   cont4->SetJetRadius(0.5);
   cont4->SetJetAcceptanceType(AliJetContainer::kTPCfid);
