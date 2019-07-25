@@ -26,7 +26,7 @@ def alienv_exec(cmd, pkg):
     cmd = " ".join(cmd)
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     out, err = proc.communicate()
-    return proc.returncode, out, err
+    return proc.returncode, out.decode(sys.stdout.encoding), err.decode(sys.stdout.encoding)
 
 def GetAliPhysicsVersion(ver):
     if ver == "_last_":
@@ -270,7 +270,7 @@ def RunHerwig(nevents, pdfid, job_number, load_packages_separately):
                 myfile.write("\n")
                 myfile.write(err)
                 myfile.write("\n")
-                out = subprocess.check_output(["ls"])
+                out = subprocess.check_output(["ls"]).decode(sys.stdout.encoding)
                 myfile.write(out)
                 myfile.write("\n")
             cmd = "export LHAPDF_DATA_PATH=./:$LHAPDF_DATA_PATH;export LHAPDF_PDFSETS_ROOT=./;Herwig read --repo=$HERWIG_ROOT/share/Herwig/HerwigDefaults.rpo herwig.in"
@@ -280,7 +280,7 @@ def RunHerwig(nevents, pdfid, job_number, load_packages_separately):
             myfile.write("\n")
             myfile.write(err)
             myfile.write("\n")
-            out = subprocess.check_output(["ls"])
+            out = subprocess.check_output(["ls"]).decode(sys.stdout.encoding)
             myfile.write(out)
             myfile.write("\n")
             cmd = "export LHAPDF_DATA_PATH=./:$LHAPDF_DATA_PATH;export LHAPDF_PDFSETS_ROOT=./;Herwig run herwig.run -s {} -N {}\n".format(rnd, nevents)

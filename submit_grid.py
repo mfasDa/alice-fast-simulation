@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # script to submit fast simulation jobs to the grid
 # submit a processing job using POWHEG charm settings with 100 subjobs, each producing 50k events
@@ -19,6 +19,7 @@ import random
 import re
 import shutil
 import subprocess
+import sys
 import time
 import yaml
 from alifastsim import UserConfiguration as aliuserconfig
@@ -412,9 +413,9 @@ def main(UserConf, yamlFileName, Offline, GridUpdate, OldPowhegInit, PowhegStage
         HerwigTune = None
 
     try:
-        rootPath = subprocess.check_output(["which", "root"]).rstrip()
-        alirootPath = subprocess.check_output(["which", "aliroot"]).rstrip()
-        alienPath = subprocess.check_output(["which", "alien-token-info"]).rstrip()
+        rootPath = subprocess.check_output(["which", "root"]).decode(sys.stdout.encoding).rstrip()
+        alirootPath = subprocess.check_output(["which", "aliroot"]).decode(sys.stdout.encoding).rstrip()
+        alienPath = subprocess.check_output(["which", "alien-token-info"]).decode(sys.stdout.encoding).rstrip()
     except subprocess.CalledProcessError:
         logging.error("Environment is not configured correctly!")
         exit()
@@ -491,7 +492,7 @@ if __name__ == '__main__':
     loglevel=logging.INFO
     if args.debug:
         loglevel = logging.DEBUG
-    logging.basicConfig(format='[%(levelname)s]: %(message)s', level=loglevel
+    logging.basicConfig(format='[%(levelname)s]: %(message)s', level=loglevel)
 
     userConf = aliuserconfig.LoadUserConfiguration(args.user_conf)
 
