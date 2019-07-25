@@ -264,7 +264,7 @@ def SubmitProcessingJobs(TrainName, LocalPath, AlienPath, AliPhysicsVersion, Off
             FilesToCopy.append(HerwigTune)
         FilesToDelete.append("herwig.in")
         if not LoadPackagesSeparately:
-            Packages += "\"VO_ALICE@Herwig::v7.1.2-alice1-1\",\n"
+            Packages += "\"VO_ALICE@Herwig::v7.1.2-alice1-3\",\n"
 
     if PtHardList and len(PtHardList) > 1:
         minPtHardBin = 0

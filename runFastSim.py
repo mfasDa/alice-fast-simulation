@@ -236,7 +236,7 @@ def RunHerwig(nevents, pdfid, job_number, load_packages_separately):
     pdfname = lhapdf_utils.GetPDFName(pdfid, False)
     hepfile = "events.hepmc"
     if load_packages_separately:
-        herwig_pkg = "VO_ALICE@Herwig::v7.1.2-alice1-1"
+        herwig_pkg = "VO_ALICE@Herwig::v7.1.2-alice1-3"
         print("Starting a separate shell to load the Herwig package...")
         with open("herwig_stdout.log", "w") as myfile:
             cmd = "which Herwig"
