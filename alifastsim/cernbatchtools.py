@@ -1,7 +1,9 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 import os
 import subprocess
+import logging
 from alifastsim import Tools as alisimtools
+from alifastsim import PackageTools as alipackagetools
 
 class cernbatchtools:
 
@@ -26,16 +28,16 @@ class cernbatchtools:
     def submitJobs(self, repo, simtask, workdir, jobscriptbase, logfilebase, envscript, batchconfig, njobs, joboffset):
         for ijob in range(joboffset, njobs + joboffset):
             taskjobscriptname = jobscriptbase
-            taskjobscriptname = os.path.join(workdir, taskjobscriptname.replace("RANK", "%0d" %ijob))
+            taskjobscriptname = os.path.join(workdir, taskjobscriptname.replace("RANK", "%04d" %ijob))
             tasklogfile = logfilebase
-            tasklogfile = os.path.join(tasklogfile.replace("RANK", "%04d"))
-            with open(taskjobscriptname) as jobscriptwriter:
-                jobscriptwriter.writer("#!/bin/bash\n")
-                myfile.write(alipackagetools.GenerateComments())
-                self.get_batchsub()(jobscriptwriter, batchconfig, tasklogfile)
-                self.writeSimCommand(self, repo, envscript, workdir, simtask.create_task_command_serial(ijob))
+            tasklogfile = os.path.join(workdir, tasklogfile.replace("RANK", "%04d" %ijob))
+            with open(taskjobscriptname, 'w') as jobscriptwriter:
+                jobscriptwriter.write("#!/bin/bash\n")
+                jobscriptwriter.write(alipackagetools.GenerateComments())
+                self.get_batchhandler()(jobscriptwriter, batchconfig, tasklogfile)
+                self.writeSimCommand(repo, jobscriptwriter, envscript, workdir, simtask.create_task_command_serial(ijob))
                 jobscriptwriter.close()
-                os.chmod(taskjobscriptname, 0755)
+                os.chmod(taskjobscriptname, 0o755)
                 output = alisimtools.subprocess_checkoutput([self.get_batchsub(), taskjobscriptname])
                 logging.info("%s", output)
 

@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 import os
 import math
@@ -70,7 +70,7 @@ class nerscbatchtools:
                 jobscriptwriter.write("module load cray-python/2.7.15.1\n")  # python with mpi, needed for srun
                 self.writeSimCommandMPI(repo, jobscriptwriter, nslots, njobs, joboffset, envscript, workdir, simtask.create_task_command_mpi(), os.path.join(workdir,logfilebase))
                 jobscriptwriter.close()
-                os.chmod(taskjobscriptname, 0755)
+                os.chmod(taskjobscriptname, 0o755)
                 output = alisimtools.subprocess_checkoutput([self.get_batchsub(), taskjobscriptname])
                 logging.info("%s", output)
 
@@ -87,7 +87,7 @@ class nerscbatchtools:
                     self.configbatch_slurm(jobscriptwriter, batchconfig, 1, 1, 1, tasklogfile)
                     self.writeSimCommand(repo, jobscriptwriter, envscript, workdir, simtask.create_task_command_serial(ijob))
                     jobscriptwriter.close()
-                    os.chmod(taskjobscriptname, 0755)
+                    os.chmod(taskjobscriptname, 0o755)
                     output = alisimtools.subprocess_checkoutput([self.get_batchsub(), taskjobscriptname])
                     logging.info("%s", output)
                     

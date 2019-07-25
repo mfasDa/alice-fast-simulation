@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import time
 import datetime
@@ -6,6 +6,7 @@ import platform
 import os
 import shutil
 import subprocess
+import sys
 import argparse
 import random
 import glob
@@ -112,17 +113,16 @@ def RunPowhegParallel(powhegExe, powheg_stage, job_number, load_packages_separat
     if load_packages_separately:
         with open(LogFileName, "w") as myfile:
             shell = subprocess.Popen(["bash"], stdin=subprocess.PIPE, stdout=myfile, stderr=myfile)
-            shell.stdin.write("alienv enter VO_ALICE@POWHEG::r3178-alice1-1\n")
-            shell.stdin.write("which {}\n".format(powhegExe))
-            shell.stdin.write("{}\n".format(powhegExe))
-            shell.stdin.write("{}\n".format(job_number))
+            shell.stdin.write(str.encode("alienv enter VO_ALICE@POWHEG::r3178-alice1-1\n"))
+            shell.stdin.write(str.encode("which {}\n".format(powhegExe)))
+            shell.stdin.write(str.encode("{} {}\n".format(powhegExe, job_number)))
             shell.communicate()
     else:
         print("Running POWHEG...")
         with open(LogFileName, "w") as myfile:
             print([powhegExe, str(job_number)])
             p = subprocess.Popen([powhegExe], stdout=myfile, stderr=myfile, stdin=subprocess.PIPE)
-            p.communicate(input=str(job_number))
+            p.communicate(input=str.encode(str(job_number)))
 
     if powheg_stage == 4:
         lhefile = "pwgevents-{:04d}.lhe".format(job_number)
@@ -148,9 +148,9 @@ def RunPowhegSingle(powhegExe, load_packages_separately):
     if load_packages_separately:
         with open("powheg.log", "w") as myfile:
             shell = subprocess.Popen(["bash"], stdin=subprocess.PIPE, stdout=myfile, stderr=myfile)
-            shell.stdin.write("alienv enter VO_ALICE@POWHEG::r3178-alice1-1\n")
-            shell.stdin.write("which {}\n".format(powhegExe))
-            shell.stdin.write("{}\n".format(powhegExe))
+            shell.stdin.write(str.encode("alienv enter VO_ALICE@POWHEG::r3178-alice1-1\n"))
+            shell.stdin.write(str.encode("which {}\n".format(powhegExe)))
+            shell.stdin.write(str.encode("{}\n".format(powhegExe)))
             shell.communicate()
     else:
         print("Running POWHEG...")
@@ -379,8 +379,8 @@ def main(events, powheg_stage, job_number, yamlConfigFile, batch_job, input_even
 
     if not load_packages_separately:
         try:
-            rootPath = subprocess.check_output(["which", "root"]).rstrip()
-            alirootPath = subprocess.check_output(["which", "aliroot"]).rstrip()
+            rootPath = subprocess.check_output(["which", "root"]).decode(sys.stdout.encoding).rstrip()
+            alirootPath = subprocess.check_output(["which", "aliroot"]).decode(sys.stdout.encoding).rstrip()
         except subprocess.CalledProcessError:
             print("Environment is not configured correctly!")
             exit()
