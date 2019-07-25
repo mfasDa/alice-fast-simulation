@@ -28,7 +28,7 @@ class nerscbatchtools:
 
     def configbatch_slurm(self, scriptwriter, batchconfig, nnodes, ntasks, ncpu, outputfile):
         breader = open(batchconfig, "r")
-        bcdata = yaml.load(breader)
+        bcdata = yaml.load(breader, yaml.SafeLoader)
         breader.close()
         nerscsystem = os.environ["NERSC_HOST"]
         scriptwriter.write("#SBATCH --qos=%s\n" %bcdata["qos"])
@@ -48,7 +48,7 @@ class nerscbatchtools:
 
     def submitJobs(self, repo, simtask, workdir, jobscriptbase, logfilebase, envscript, batchconfig, njobs, joboffset):
         breader = open(batchconfig, "r")
-        bcdata = yaml.load(breader)
+        bcdata = yaml.load(breader, yaml.SafeLoader)
         breader.close()
         
         ismpiqueue = bcdata["qos"] != "shared"

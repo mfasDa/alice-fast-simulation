@@ -218,7 +218,7 @@ def SubmitProcessingJobs(TrainName, LocalPath, AlienPath, AliPhysicsVersion, Off
                    "AliPythiaBase_dev.h", "AliPythiaBase_dev.cxx",
                    "THepMCParser_dev.h", "THepMCParser_dev.cxx"]
     
-    Packages = "\"VO_ALICE@Python-modules::1.0-12\",\n"
+    Packages = "\"VO_ALICE@Python-modules::1.0-27\",\n"
     if not LoadPackagesSeparately:
         Packages += "\"VO_ALICE@AliPhysics::{aliphysics}\",\n".format(aliphysics=AliPhysicsVersion)
 
@@ -388,7 +388,7 @@ def GetAliPhysicsVersion(ver):
 
 def main(UserConf, yamlFileName, Offline, GridUpdate, OldPowhegInit, PowhegStage, Merge, Download, MergingStage):
     f = open(yamlFileName, 'r')
-    config = yaml.load(f)
+    config = yaml.load(f, yaml.SafeLoader)
     f.close()
 
     if "load_packages_separately" in config["grid_config"]:

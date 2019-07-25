@@ -366,7 +366,7 @@ def main(events, powheg_stage, job_number, yamlConfigFile, batch_job, input_even
     os.chdir(dname)
 
     f = open(args.config, 'r')
-    config = yaml.load(f)
+    config = yaml.load(f, yaml.SafeLoader)
     f.close()
 
     if "load_packages_separately" in config["grid_config"]:

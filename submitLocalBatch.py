@@ -137,7 +137,7 @@ def SubmitProcessingJobs(TrainName, LocalPath, Events, Jobs, Gen, Proc, yamlFile
 
 def main(UserConf, yamlFileName, batchconfig, continue_powheg, powheg_stage, XGridIter):
     f = open(yamlFileName, 'r')
-    config = yaml.load(f)
+    config = yaml.load(f, yaml.SafeLoader)
     f.close()
     
     Gen = config["gen"]
