@@ -1,6 +1,10 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
+import logging
+import os
 import shutil
+import subprocess
+
 from alifastsim import Tools as alisimtools
 
 def AlienDelete(fileName):
@@ -53,7 +57,7 @@ def AlienCopy(source, destination, attempts=3, overwrite=False):
         if fileExists:
             break
         if i >= attempts:
-            print("After {0} attempts I could not copy {1} to {2}".format(i, source, dest))
+            logging.info("After {0} attempts I could not copy {1} to {2}".format(i, source, dest))
             break
 
     return fileExists
@@ -64,7 +68,7 @@ def CopyFilesToTheGrid(Files, AlienDest, LocalDest, Offline, GridUpdate):
         alisimtools.subprocess_call(["alien_mkdir", "-p", "{0}/output".format(AlienDest)])
 
     if not os.path.isdir(LocalDest):
-        print "Creating directory " + LocalDest
+        logging.info("Creating directory %s", LocalDest)
         os.makedirs(LocalDest)
     for file in Files:
         fname = os.path.basename(file)

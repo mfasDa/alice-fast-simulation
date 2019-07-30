@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 import os
 import math
@@ -28,7 +28,7 @@ class nerscbatchtools:
 
     def configbatch_slurm(self, scriptwriter, batchconfig, nnodes, ntasks, ncpu, outputfile):
         breader = open(batchconfig, "r")
-        bcdata = yaml.load(breader)
+        bcdata = yaml.load(breader, yaml.SafeLoader)
         breader.close()
         nerscsystem = os.environ["NERSC_HOST"]
         scriptwriter.write("#SBATCH --qos=%s\n" %bcdata["qos"])
@@ -48,7 +48,7 @@ class nerscbatchtools:
 
     def submitJobs(self, repo, simtask, workdir, jobscriptbase, logfilebase, envscript, batchconfig, njobs, joboffset):
         breader = open(batchconfig, "r")
-        bcdata = yaml.load(breader)
+        bcdata = yaml.load(breader, yaml.SafeLoader)
         breader.close()
         
         ismpiqueue = bcdata["qos"] != "shared"
@@ -70,7 +70,7 @@ class nerscbatchtools:
                 jobscriptwriter.write("module load cray-python/2.7.15.1\n")  # python with mpi, needed for srun
                 self.writeSimCommandMPI(repo, jobscriptwriter, nslots, njobs, joboffset, envscript, workdir, simtask.create_task_command_mpi(), os.path.join(workdir,logfilebase))
                 jobscriptwriter.close()
-                os.chmod(taskjobscriptname, 0755)
+                os.chmod(taskjobscriptname, 0o755)
                 output = alisimtools.subprocess_checkoutput([self.get_batchsub(), taskjobscriptname])
                 logging.info("%s", output)
 
@@ -87,7 +87,7 @@ class nerscbatchtools:
                     self.configbatch_slurm(jobscriptwriter, batchconfig, 1, 1, 1, tasklogfile)
                     self.writeSimCommand(repo, jobscriptwriter, envscript, workdir, simtask.create_task_command_serial(ijob))
                     jobscriptwriter.close()
-                    os.chmod(taskjobscriptname, 0755)
+                    os.chmod(taskjobscriptname, 0o755)
                     output = alisimtools.subprocess_checkoutput([self.get_batchsub(), taskjobscriptname])
                     logging.info("%s", output)
                     

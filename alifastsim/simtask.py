@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 class simtask:
 
@@ -22,7 +22,7 @@ class simtask:
         taskcommand = self.__executable
         for arg in self.__defaultargs:
             taskcommand += " %s" %arg
-        for argk, argv in self.__optionalargs.iteritems():
+        for argk, argv in self.__optionalargs.items():
             taskcommand += " %s" %argk
             if len(argv):
                 taskcommand += " %s" %argv

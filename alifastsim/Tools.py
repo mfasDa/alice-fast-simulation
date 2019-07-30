@@ -30,6 +30,6 @@ def subprocess_cmd(command):
     logging.info(proc_stdout)
 
 def copy_to_workdir(Files):
-    for inputfile, outputfile in Files.iteritems():
+    for inputfile, outputfile in Files.items():
         logging.info("Copying %s to %s", inputfile, outputfile)
         shutil.copy(inputfile, outputfile)

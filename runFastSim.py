@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import time
 import datetime
@@ -6,6 +6,7 @@ import platform
 import os
 import shutil
 import subprocess
+import sys
 import argparse
 import random
 import glob
@@ -25,7 +26,7 @@ def alienv_exec(cmd, pkg):
     cmd = " ".join(cmd)
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     out, err = proc.communicate()
-    return proc.returncode, out, err
+    return proc.returncode, out.decode(sys.stdout.encoding), err.decode(sys.stdout.encoding)
 
 def GetAliPhysicsVersion(ver):
     if ver == "_last_":
@@ -112,17 +113,16 @@ def RunPowhegParallel(powhegExe, powheg_stage, job_number, load_packages_separat
     if load_packages_separately:
         with open(LogFileName, "w") as myfile:
             shell = subprocess.Popen(["bash"], stdin=subprocess.PIPE, stdout=myfile, stderr=myfile)
-            shell.stdin.write("alienv enter VO_ALICE@POWHEG::r3178-alice1-1\n")
-            shell.stdin.write("which {}\n".format(powhegExe))
-            shell.stdin.write("{}\n".format(powhegExe))
-            shell.stdin.write("{}\n".format(job_number))
+            shell.stdin.write(str.encode("alienv enter VO_ALICE@POWHEG::r3178-alice1-1\n"))
+            shell.stdin.write(str.encode("which {}\n".format(powhegExe)))
+            shell.stdin.write(str.encode("{} {}\n".format(powhegExe, job_number)))
             shell.communicate()
     else:
         print("Running POWHEG...")
         with open(LogFileName, "w") as myfile:
             print([powhegExe, str(job_number)])
             p = subprocess.Popen([powhegExe], stdout=myfile, stderr=myfile, stdin=subprocess.PIPE)
-            p.communicate(input=str(job_number))
+            p.communicate(input=str.encode(str(job_number)))
 
     if powheg_stage == 4:
         lhefile = "pwgevents-{:04d}.lhe".format(job_number)
@@ -148,9 +148,9 @@ def RunPowhegSingle(powhegExe, load_packages_separately):
     if load_packages_separately:
         with open("powheg.log", "w") as myfile:
             shell = subprocess.Popen(["bash"], stdin=subprocess.PIPE, stdout=myfile, stderr=myfile)
-            shell.stdin.write("alienv enter VO_ALICE@POWHEG::r3178-alice1-1\n")
-            shell.stdin.write("which {}\n".format(powhegExe))
-            shell.stdin.write("{}\n".format(powhegExe))
+            shell.stdin.write(str.encode("alienv enter VO_ALICE@POWHEG::r3178-alice1-1\n"))
+            shell.stdin.write(str.encode("which {}\n".format(powhegExe)))
+            shell.stdin.write(str.encode("{}\n".format(powhegExe)))
             shell.communicate()
     else:
         print("Running POWHEG...")
@@ -236,7 +236,7 @@ def RunHerwig(nevents, pdfid, job_number, load_packages_separately):
     pdfname = lhapdf_utils.GetPDFName(pdfid, False)
     hepfile = "events.hepmc"
     if load_packages_separately:
-        herwig_pkg = "VO_ALICE@Herwig::v7.1.2-alice1-1"
+        herwig_pkg = "VO_ALICE@Herwig::v7.1.2-alice1-3"
         print("Starting a separate shell to load the Herwig package...")
         with open("herwig_stdout.log", "w") as myfile:
             cmd = "which Herwig"
@@ -270,7 +270,7 @@ def RunHerwig(nevents, pdfid, job_number, load_packages_separately):
                 myfile.write("\n")
                 myfile.write(err)
                 myfile.write("\n")
-                out = subprocess.check_output(["ls"])
+                out = subprocess.check_output(["ls"]).decode(sys.stdout.encoding)
                 myfile.write(out)
                 myfile.write("\n")
             cmd = "export LHAPDF_DATA_PATH=./:$LHAPDF_DATA_PATH;export LHAPDF_PDFSETS_ROOT=./;Herwig read --repo=$HERWIG_ROOT/share/Herwig/HerwigDefaults.rpo herwig.in"
@@ -280,7 +280,7 @@ def RunHerwig(nevents, pdfid, job_number, load_packages_separately):
             myfile.write("\n")
             myfile.write(err)
             myfile.write("\n")
-            out = subprocess.check_output(["ls"])
+            out = subprocess.check_output(["ls"]).decode(sys.stdout.encoding)
             myfile.write(out)
             myfile.write("\n")
             cmd = "export LHAPDF_DATA_PATH=./:$LHAPDF_DATA_PATH;export LHAPDF_PDFSETS_ROOT=./;Herwig run herwig.run -s {} -N {}\n".format(rnd, nevents)
@@ -366,7 +366,7 @@ def main(events, powheg_stage, job_number, yamlConfigFile, batch_job, input_even
     os.chdir(dname)
 
     f = open(args.config, 'r')
-    config = yaml.load(f)
+    config = yaml.load(f, yaml.SafeLoader)
     f.close()
 
     if "load_packages_separately" in config["grid_config"]:
@@ -379,8 +379,8 @@ def main(events, powheg_stage, job_number, yamlConfigFile, batch_job, input_even
 
     if not load_packages_separately:
         try:
-            rootPath = subprocess.check_output(["which", "root"]).rstrip()
-            alirootPath = subprocess.check_output(["which", "aliroot"]).rstrip()
+            rootPath = subprocess.check_output(["which", "root"]).decode(sys.stdout.encoding).rstrip()
+            alirootPath = subprocess.check_output(["which", "aliroot"]).decode(sys.stdout.encoding).rstrip()
         except subprocess.CalledProcessError:
             print("Environment is not configured correctly!")
             exit()

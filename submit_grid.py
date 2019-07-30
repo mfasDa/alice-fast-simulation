@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # script to submit fast simulation jobs to the grid
 # submit a processing job using POWHEG charm settings with 100 subjobs, each producing 50k events
@@ -19,6 +19,7 @@ import random
 import re
 import shutil
 import subprocess
+import sys
 import time
 import yaml
 from alifastsim import UserConfiguration as aliuserconfig
@@ -217,7 +218,7 @@ def SubmitProcessingJobs(TrainName, LocalPath, AlienPath, AliPhysicsVersion, Off
                    "AliPythiaBase_dev.h", "AliPythiaBase_dev.cxx",
                    "THepMCParser_dev.h", "THepMCParser_dev.cxx"]
     
-    Packages = "\"VO_ALICE@Python-modules::1.0-12\",\n"
+    Packages = "\"VO_ALICE@Python-modules::1.0-27\",\n"
     if not LoadPackagesSeparately:
         Packages += "\"VO_ALICE@AliPhysics::{aliphysics}\",\n".format(aliphysics=AliPhysicsVersion)
 
@@ -264,7 +265,7 @@ def SubmitProcessingJobs(TrainName, LocalPath, AlienPath, AliPhysicsVersion, Off
             FilesToCopy.append(HerwigTune)
         FilesToDelete.append("herwig.in")
         if not LoadPackagesSeparately:
-            Packages += "\"VO_ALICE@Herwig::v7.1.2-alice1-1\",\n"
+            Packages += "\"VO_ALICE@Herwig::v7.1.2-alice1-3\",\n"
 
     if PtHardList and len(PtHardList) > 1:
         minPtHardBin = 0
@@ -387,7 +388,7 @@ def GetAliPhysicsVersion(ver):
 
 def main(UserConf, yamlFileName, Offline, GridUpdate, OldPowhegInit, PowhegStage, Merge, Download, MergingStage):
     f = open(yamlFileName, 'r')
-    config = yaml.load(f)
+    config = yaml.load(f, yaml.SafeLoader)
     f.close()
 
     if "load_packages_separately" in config["grid_config"]:
@@ -412,9 +413,9 @@ def main(UserConf, yamlFileName, Offline, GridUpdate, OldPowhegInit, PowhegStage
         HerwigTune = None
 
     try:
-        rootPath = subprocess.check_output(["which", "root"]).rstrip()
-        alirootPath = subprocess.check_output(["which", "aliroot"]).rstrip()
-        alienPath = subprocess.check_output(["which", "alien-token-info"]).rstrip()
+        rootPath = subprocess.check_output(["which", "root"]).decode(sys.stdout.encoding).rstrip()
+        alirootPath = subprocess.check_output(["which", "aliroot"]).decode(sys.stdout.encoding).rstrip()
+        alienPath = subprocess.check_output(["which", "alien-token-info"]).decode(sys.stdout.encoding).rstrip()
     except subprocess.CalledProcessError:
         logging.error("Environment is not configured correctly!")
         exit()
@@ -491,7 +492,7 @@ if __name__ == '__main__':
     loglevel=logging.INFO
     if args.debug:
         loglevel = logging.DEBUG
-    logging.basicConfig(format='[%(levelname)s]: %(message)s', level=loglevel
+    logging.basicConfig(format='[%(levelname)s]: %(message)s', level=loglevel)
 
     userConf = aliuserconfig.LoadUserConfiguration(args.user_conf)
 
