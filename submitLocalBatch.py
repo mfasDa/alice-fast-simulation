@@ -95,7 +95,7 @@ def SubmitProcessingJobs(TrainName, LocalPath, Events, Jobs, Gen, Proc, yamlFile
                         "AliPythiaBase_dev.h", "AliPythiaBase_dev.cxx"]
 
         if "pythia8" in Gen:
-            FilesToCopy.append("powheg_pythia8_conf.cmnd")
+            Sourcefiles.append("powheg_pythia8_conf.cmnd")
         if "powheg" in Gen:
             alipowhegtools.main(yamlFileName, LocalDest, Events, 1, 1)
             alipowhegtools.main(yamlFileName, LocalDest, Events, 1, 2)
