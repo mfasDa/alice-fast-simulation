@@ -86,6 +86,7 @@ class nerscbatchtools:
                     jobscriptwriter.write(alipackagetools.GenerateComments())
                     self.configbatch_slurm(jobscriptwriter, batchconfig, 1, 1, 1, tasklogfile)
                     self.writeSimCommand(repo, jobscriptwriter, envscript, workdir, simtask.create_task_command_serial(ijob))
+                    self.writeCleanCommand(jobscriptwriter, envscript, ijob)
                     jobscriptwriter.close()
                     os.chmod(taskjobscriptname, 0o755)
                     output = alisimtools.subprocess_checkoutput([self.get_batchsub(), taskjobscriptname])
@@ -103,6 +104,18 @@ class nerscbatchtools:
 
     def writeSimCommandMPI(self, repo, scriptwriter, nslots, njobs, joboffset, envscript, workdir, simcommand, logfiletemplate):
         scriptwriter.write("srun -n %d python %s/nersc/mpiwrapper.py %d %d %s/%s %s \"%s\" %s\n" %(nslots, repo, njobs, joboffset, os.environ["CSCRATCH"], envscript, workdir, simcommand, logfiletemplate))
+
+    def writeCleanCommand(self, jobscriptwriter, envscript, jobid):
+        FilesToDelete = []
+        if "herwig" in envscript:
+            FilesToDelete.append("events_%04d.hepmc" %jobid)
+            FilesToDelete.append("herwig_%04d.in" %jobid)
+            FilesToDelete.append("herwig_%04d.run" %jobid)
+        elif "powheg" in envscript:
+            FilesToDelete.append("pwgevents-%04d.lhe" %jobid)
+            FilesToDelete.append("pwgevents-%04d.lhe.bak" %jobid)
+        for f in FilesToDelete:
+            jobscriptwriter.write("rm -vf %s\n" %f)
 
     def run_build(self, repo, workdir, envscript):
         currentdir = os.getcwd()
