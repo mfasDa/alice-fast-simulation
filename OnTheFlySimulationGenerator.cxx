@@ -10,6 +10,7 @@
 #include <TChain.h>
 #include <TFile.h>
 #include <TMath.h>
+#include <ROOT/TSeq.hxx>
 
 // AliRoot classes
 #include <AliESDInputHandler.h>
