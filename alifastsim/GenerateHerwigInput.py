@@ -75,7 +75,7 @@ def GenerateHerwigInput(config_params, outputdir, events):
 
 def main(yamlConfigFile, outputdir, events):
     f = open(yamlConfigFile, 'r')
-    configparams = yaml.load(f)
+    configparams = yaml.load(f, Loader=yaml.SafeLoader)
     f.close()
 
     GenerateHerwigInput(configparams, outputdir, events)

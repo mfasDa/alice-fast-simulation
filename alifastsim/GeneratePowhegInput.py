@@ -106,7 +106,7 @@ def GenerateSinglePowhegInput(outputdir, events, powheg_proc, bornonly, qmass, f
 
 def main(yamlConfigFile, outputdir, events, powheg_stage, x_grid_iter=1):
     f = open(yamlConfigFile, 'r')
-    config = yaml.load(f)
+    config = yaml.load(f, Loader=yaml.SafeLoader)
     f.close()
 
     proc = config["proc"]
