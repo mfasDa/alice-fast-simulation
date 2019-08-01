@@ -125,7 +125,8 @@ def SubmitProcessingJobs(TrainName, LocalPath, Events, Jobs, Gen, Proc, yamlFile
 
         logging.info("Compiling analysis code...")
         get_batchtools().run_build(repo, LocalDest, envscript)
-        for file in FilesToDelete: os.remove(file)
+        for file in FilesToDelete: 
+            os.remove(file)
 
     if "powheg" in Gen:
         SubmitParallelPowheg(LocalDest, ExeFile, Events, Jobs, yamlFileName, batchconfig, envscript, PowhegStage, XGridIter)

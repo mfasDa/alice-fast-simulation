@@ -28,10 +28,10 @@ class cernbatchtools:
     def submitJobs(self, repo, simtask, workdir, jobscriptbase, logfilebase, envscript, batchconfig, njobs, joboffset):
         for ijob in range(joboffset, njobs + joboffset):
             taskjobscriptname = jobscriptbase
-            workdir = os.path.abspath(os.path.dirname(jobscriptbase))
             taskjobscriptname = os.path.join(workdir, taskjobscriptname.replace("RANK", "%04d" %ijob))
             tasklogfile = logfilebase
             tasklogfile = os.path.join(workdir, tasklogfile.replace("RANK", "%04d" %ijob))
+            logging.info("Using jobscript {jobscript}, writing to {logfile}".format(jobscript=taskjobscriptname,logfile=tasklogfile))
             with open(taskjobscriptname, 'w') as jobscriptwriter:
                 jobscriptwriter.write("#!/bin/bash\n")
                 jobscriptwriter.write(alipackagetools.GenerateComments())

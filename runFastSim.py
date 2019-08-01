@@ -295,7 +295,7 @@ def RunHerwig(nevents, pdfid, job_number, load_packages_separately):
             print("Running HERWIG...")
             with open("herwig_stdout_%d.log" %(job_number), "w") as myfile:
                 # Verify that PDF is installed
-                pdfsetlist = subprocess.check_output(["lhapdf", "list", "--installed"]).splitlines()
+                pdfsetlist = subprocess.check_output(["lhapdf", "list", "--installed"]).decode(sys.stdout.encoding).splitlines()
                 if pdfname in pdfsetlist:
                     print("PDF '{}' already installed.".format(pdfname))
                 else:
