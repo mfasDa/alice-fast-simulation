@@ -28,6 +28,7 @@ class cernbatchtools:
     def submitJobs(self, repo, simtask, workdir, jobscriptbase, logfilebase, envscript, batchconfig, njobs, joboffset):
         for ijob in range(joboffset, njobs + joboffset):
             taskjobscriptname = jobscriptbase
+            workdir = os.path.abspath(os.path.dirname(jobscriptbase))
             taskjobscriptname = os.path.join(workdir, taskjobscriptname.replace("RANK", "%04d" %ijob))
             tasklogfile = logfilebase
             tasklogfile = os.path.join(workdir, tasklogfile.replace("RANK", "%04d" %ijob))
@@ -36,6 +37,8 @@ class cernbatchtools:
                 jobscriptwriter.write(alipackagetools.GenerateComments())
                 self.get_batchhandler()(jobscriptwriter, batchconfig, tasklogfile)
                 self.writeSimCommand(repo, jobscriptwriter, envscript, workdir, simtask.create_task_command_serial(ijob))
+                jobscriptwriter.write("cd %s\n" %workdir)
+                jobscriptwriter.write("echo WD: $PWD\n")
                 self.writeCleanCommand(jobscriptwriter, envscript, ijob)
                 jobscriptwriter.close()
                 os.chmod(taskjobscriptname, 0o755)
@@ -62,7 +65,7 @@ class cernbatchtools:
             FilesToDelete.append("pwgevents-%04d.lhe" %jobid)
             FilesToDelete.append("pwgevents-%04d.lhe.bak" %jobid)
         for f in FilesToDelete:
-            jobscriptwriter.write("rm -vf %s\n" %f)
+            jobscriptwriter.write("rm -v %s\n" %f)
 
     def run_build(self, repo, workdir, envscript):
         currentdir = os.getcwd()
