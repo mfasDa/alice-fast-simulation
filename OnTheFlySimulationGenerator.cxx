@@ -233,6 +233,7 @@ void OnTheFlySimulationGenerator::AddJetQA(const char* file_name)
   if (fMinPtHard > -1 && fMaxPtHard > fMinPtHard) pJetQA->SetMCFilter();
   pJetQA->SetJetPtFactor(4);
   pJetQA->SetForceBeamType(AliAnalysisTaskEmcalLight::kpp);
+  pJetQA->SetUseBuiltinEventSelection(kTRUE);
   pJetQA->SetCentralityEstimation(AliAnalysisTaskEmcalLight::kNoCentrality);
   pJetQA->SetMC(kTRUE);
   pJetQA->SetParticleLevel(kTRUE);
@@ -263,6 +264,7 @@ void OnTheFlySimulationGenerator::AddDJet(const char* file_name)
   pDMesonJetsTask->SetIsPythia(kTRUE);
   pDMesonJetsTask->SetNeedEmcalGeom(kFALSE);
   pDMesonJetsTask->SetForceBeamType(AliAnalysisTaskEmcalLight::kpp);
+  pDMesonJetsTask->SetUseBuiltinEventSelection(kTRUE);
   pDMesonJetsTask->SetCentralityEstimation(AliAnalysisTaskEmcalLight::kNoCentrality);
   if (fExtendedEventInfo) {
     pDMesonJetsTask->SetOutputType(AliAnalysisTaskDmesonJets::kTreeExtendedOutput);
